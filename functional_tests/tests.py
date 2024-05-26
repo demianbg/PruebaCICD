@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright, expect, Browser
 
 from django.urls import reverse
 
-from app.models import Client, Pet, Vet, Speciality, Provider, Medicine
+from app.models import Client, Pet, Vet, Speciality, Provider, Medicine, Product
 
 import datetime
 
@@ -262,26 +262,26 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
         expect(self.page.get_by_text("Antibiotico")).to_be_visible()
         expect(self.page.get_by_text("10")).to_be_visible()
 
-    #def test_should_view_errors_if_price_is_zero(self):
-     #   self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
+    def test_should_view_errors_if_price_is_zero(self):
+        self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
 
-      #  expect(self.page.get_by_role("form")).to_be_visible()
+        expect(self.page.get_by_role("form")).to_be_visible()
         
-       # self.page.get_by_role("button", name="Guardar").click()
+        self.page.get_by_role("button", name="Guardar").click()
 
-        #expect(self.page.get_by_text("Por favor ingrese un nombre")).to_be_visible()
-        #expect(self.page.get_by_text("Por favor ingrese un tipo")).to_be_visible()
-        #expect(self.page.get_by_text("Por favor ingrese un precio")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un nombre")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un tipo")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un precio")).to_be_visible()
         
-        #self.page.get_by_label("Nombre").fill("ampicilina")
-        #self.page.get_by_label("Tipo").fill("antibiotico")
-        #self.page.get_by_label("Precio").fill("0")
+        self.page.get_by_label("Nombre").fill("ampicilina")
+        self.page.get_by_label("Tipo").fill("antibiotico")
+        self.page.get_by_label("Precio").fill("0")
 
-        #self.page.get_by_role("button", name="Guardar").click()
+        self.page.get_by_role("button", name="Guardar").click()
 
-        #expect(self.page.get_by_text("Por favor ingrese un nombre")).not_to_be_visible()
-        #expect(self.page.get_by_text("Por favor ingrese un tipo")).not_to_be_visible()
-        #expect(self.page.get_by_text("Por favor ingrese un precio mayor a cero")).to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un nombre")).not_to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un tipo")).not_to_be_visible()
+        expect(self.page.get_by_text("Por favor ingrese un precio mayor a cero")).to_be_visible()
 
     
     def test_should_view_errors_if_price_is_negative(self):
@@ -314,6 +314,62 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
         self.page.get_by_role("button", name="Guardar").click()
 
         expect(self.page.get_by_text("Por favor ingrese un precio")).to_be_visible()
+    
+
+    def test_should_not_allow_editing_product_with_empty_or_zero_price(self):
+    # Crear un producto inicialmente válido
+        product = Product.objects.create(
+            name="ampicilina",
+            type="antibiotico",
+            price=10
+        )
+
+    # Navegar al formulario de edición del producto
+        path = reverse("products_edit", kwargs={"id": product.id})
+        self.page.goto(f"{self.live_server_url}{path}")
+
+    # Intentar editar el producto con un precio vacío
+        self.page.get_by_label("Nombre").fill("Producto Editado")
+        self.page.get_by_label("Tipo").fill("Tipo Editado")
+        self.page.get_by_label("Precio").fill("")
+
+    # Intentar guardar los cambios
+        self.page.get_by_role("button", name="Guardar").click()
+
+    # Verificar que aparezca el mensaje de error correspondiente
+        expect(self.page.get_by_text("Por favor ingrese un precio")).to_be_visible()
+
+    # Intentar editar el producto con un precio de cero
+        self.page.get_by_label("Precio").fill("0")
+        self.page.get_by_role("button", name="Guardar").click()
+
+    # Verificar que aparezca el mensaje de error correspondiente
+        expect(self.page.get_by_text("Por favor ingrese un precio mayor a cero")).to_be_visible()
+
+    def test_should_not_allow_editing_product_with_negative_price(self):
+
+        # Crear un producto inicialmente válido
+        product = Product.objects.create(
+            name="ampicilina",
+            type="antibiotico",
+            price=10
+        )
+
+        # Navegar al formulario de edición del producto
+        path = reverse("products_edit", kwargs={"id": product.id})
+        self.page.goto(f"{self.live_server_url}{path}")
+
+    # Intentar editar el producto con un precio negativo
+        self.page.get_by_label("Nombre").fill("Producto Editado")
+        self.page.get_by_label("Tipo").fill("Tipo Editado")
+        self.page.get_by_label("Precio").fill("-10")
+
+    # Intentar guardar los cambios
+        self.page.get_by_role("button", name="Guardar").click()
+
+    # Verificar que aparezca el mensaje de error correspondiente
+        expect(self.page.get_by_text("Por favor ingrese un precio mayor a cero")).to_be_visible()
+
 
 
 class PetsRepoTestCase(PlaywrightTestCase):
