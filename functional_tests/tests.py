@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright, expect, Browser
 
 from django.urls import reverse
 
-from app.models import Client, Pet, Vet, Speciality, Provider
+from app.models import Client, Pet, Vet, Speciality, Provider, Medicine
 
 import datetime
 
@@ -965,3 +965,115 @@ class ProviderCreateEditTestCase(PlaywrightTestCase):
         expect(edit_action).to_have_attribute(
             "href", reverse("providers_edit", kwargs={"id":provider.id})
         )
+        
+class MedicineCreateEditTestCase(PlaywrightTestCase):
+    def test_should_be_able_to_create_a_new_medicine(self):
+        self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible
+
+        self.page.get_by_label("Nombre").fill("Bravecto")
+        self.page.get_by_label("Descripción").fill("Previene y elimina parasitos externos")
+        self.page.get_by_label("Dosis").fill("1")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Bravecto")).to_be_visible()
+        expect(self.page.get_by_text("Previene y elimina parasitos externos")).to_be_visible()
+        expect(self.page.get_by_text("1")).to_be_visible()
+    
+    def test_should_view_errors_if_form_is_invalid(self):
+        self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible()
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor, ingrese un nombre de la medicina")).to_be_visible()
+        expect(self.page.get_by_text("Por favor, ingrese una descripcion de la medicina")).to_be_visible()
+        expect(self.page.get_by_text("Por favor, ingrese una cantidad de la dosis de la medicina")).to_be_visible()
+
+        self.page.get_by_label("Nombre").fill("Bravecto")
+        self.page.get_by_label("Descripción").fill("")
+        self.page.get_by_label("Dosis").fill("1")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor, ingrese un nombre de la medicina")).not_to_be_visible()
+        expect(self.page.get_by_text("Por favor, ingrese una descripcion de la medicina")).to_be_visible()
+        expect(self.page.get_by_text("Por favor, ingrese una cantidad de la dosis de la medicina")).not_to_be_visible()
+        
+    def test_should_be_able_to_edit_a_medicine(self):
+        medicine = Medicine.objects.create(
+            name="Bravecto",
+            description="Previene y elimina parasitos externos",
+            dose=2,
+        )
+
+        path = reverse("medicine_edit", kwargs={"id": medicine.id})
+        self.page.goto(f"{self.live_server_url}{path}")
+
+        self.page.get_by_label("Nombre").fill("Meloxicam")
+        self.page.get_by_label("Descripción").fill("Antiinflamatorio")
+        self.page.get_by_label("Dosis").fill("6")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Bravecto")).not_to_be_visible()
+        expect(self.page.get_by_text("Previene y elimina parasitos externos")).not_to_be_visible()
+        expect(self.page.get_by_text("2")).not_to_be_visible()
+
+        expect(self.page.get_by_text("Meloxicam")).to_be_visible()
+        expect(self.page.get_by_text("Antiinflamatorio")).to_be_visible()
+        expect(self.page.get_by_text("6")).to_be_visible()
+
+        edit_action = self.page.get_by_role("link", name="Editar")
+        expect(edit_action).to_have_attribute(
+            "href", reverse("medicine_edit", kwargs={"id": medicine.id})
+        )    
+    
+    def test_should_not_be_able_to_create_a_new_medicine_if_dose_is_empty(self):
+        self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible
+
+        self.page.get_by_label("Nombre").fill("Bravecto")
+        self.page.get_by_label("Descripción").fill("Previene y elimina parasitos externos")
+        self.page.get_by_label("Dosis").fill("")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor, ingrese un nombre de la medicina")).not_to_be_visible()
+        expect(self.page.get_by_text("Por favor, ingrese una descripcion de la medicina")).not_to_be_visible()
+        expect(self.page.get_by_text("Por favor, ingrese una cantidad de la dosis de la medicina")).to_be_visible()
+    
+    def test_should_not_be_able_to_create_a_new_medicine_if_dose_is_decimal(self):
+        self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible
+
+        self.page.get_by_label("Nombre").fill("Bravecto")
+        self.page.get_by_label("Descripción").fill("Previene y elimina parasitos externos")
+        self.page.get_by_label("Dosis").fill("1.5")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor, ingrese un nombre de la medicina")).not_to_be_visible()
+        expect(self.page.get_by_text("Por favor, ingrese una descripcion de la medicina")).not_to_be_visible()
+        expect(self.page.get_by_text("La dosis debe ser un numero entero")).to_be_visible()
+        
+    def test_should_not_be_able_to_create_a_new_medicine_if_dose_is_out_of_range(self):
+        self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
+
+        expect(self.page.get_by_role("form")).to_be_visible
+
+        self.page.get_by_label("Nombre").fill("Bravecto")
+        self.page.get_by_label("Descripción").fill("Previene y elimina parasitos externos")
+        self.page.get_by_label("Dosis").fill("15")
+
+        self.page.get_by_role("button", name="Guardar").click()
+
+        expect(self.page.get_by_text("Por favor, ingrese un nombre de la medicina")).not_to_be_visible()
+        expect(self.page.get_by_text("Por favor, ingrese una descripcion de la medicina")).not_to_be_visible()
+        expect(self.page.get_by_text("La dosis debe estar entre 1 y 10")).to_be_visible()
+        

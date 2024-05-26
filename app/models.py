@@ -49,6 +49,11 @@ def validate_medicine(data):
     name = data.get("name", "")
     description = data.get("description", "")
     dose = data.get("dose")
+    if not dose is None:
+        try:
+            num = int(dose)
+        except ValueError:
+            num = None     
 
     if name == "":
         errors["name"] = "Por favor, ingrese un nombre de la medicina"
@@ -56,11 +61,12 @@ def validate_medicine(data):
     if description == "":
         errors["description"] = "Por favor, ingrese una descripcion de la medicina"
     
-    if dose is None:
+    if dose is None or dose == "":
         errors["dose"] = "Por favor, ingrese una cantidad de la dosis de la medicina"
     elif not (isinstance(dose, str) and dose.isdigit()):
         errors["dose"] = "La dosis debe ser un numero entero"
-    
+    elif not (num > 0 and num < 11):
+        errors["dose"] = "La dosis debe estar entre 1 y 10"
     return errors
     
 def validate_product(data):
@@ -232,11 +238,17 @@ class Medicine(models.Model):
         return True, None
 
     def update_medicine(self, medicine_data):
+        errors = validate_medicine(medicine_data)
+        
+        if len(errors.keys()) > 0:
+            return False, errors
+        
         self.name = medicine_data.get("name", "") or self.name
         self.description = medicine_data.get("description", "") or self.description
         self.dose = medicine_data.get("dose", None) or self.dose
 
         self.save()
+        return True, None
 
 class Product (models.Model):
     name = models.CharField(max_length=100)

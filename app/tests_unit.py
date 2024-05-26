@@ -1,5 +1,5 @@
 from django.test import TestCase
-from app.models import Client, Pet, validate_pet, Vet, Speciality, Provider, validate_provider, validate_product
+from app.models import Client, Pet, validate_pet, Vet, Speciality, Provider, validate_provider, validate_product, Medicine, validate_medicine
 import datetime
 
 
@@ -322,3 +322,81 @@ class ProviderModelTest(TestCase):
         updated_provider = Provider.objects.get(pk=1)
 
         self.assertEqual(updated_provider.address, "Calle falsa 123")
+        
+class MedicineModelTest(TestCase):
+    def test_can_create_and_get_medicine(self):
+        Medicine.save_medicine(
+            {
+                "name": "Meloxicam",
+                "description": "Antiinflamatorio y analgesico",
+                "dose": "2",
+            }
+        )
+        medicines = Medicine.objects.all()
+        self.assertEqual(len(medicines), 1)
+        
+        self.assertEqual(medicines[0].name, "Meloxicam")
+        self.assertEqual(medicines[0].description, "Antiinflamatorio y analgesico")
+        self.assertEqual(medicines[0].dose, 2)
+        
+    def test_can_update_medicine(self):
+        Medicine.save_medicine(
+            {
+                "name": "Meloxicam",
+                "description": "Antiinflamatorio y analgesico",
+                "dose": "2",
+            }
+        )
+        medicine = Medicine.objects.get(pk=1)
+        
+        self.assertEqual(medicine.dose, 2)
+        
+        medicine.update_medicine(
+            {
+            "name": "Meloxicam",
+                "description": "Antiinflamatorio y analgesico",
+                "dose": "8",
+            }
+        )
+        
+        medicine_updated = Medicine.objects.get(pk=1)
+        
+        self.assertEqual(medicine_updated.dose, 8)
+        
+    def test_update_medicine_with_error(self):
+        Medicine.save_medicine(
+            {
+                "name": "Meloxicam",
+                "description": "Antiinflamatorio y analgesico",
+                "dose": "2",
+            }
+        )
+        medicine = Medicine.objects.get(pk=1)
+        
+        self.assertEqual(medicine.name, "Meloxicam")
+        
+        medicine.update_medicine({"name": ""})
+        
+        medicine_updated = Medicine.objects.get(pk=1)
+        
+        self.assertEqual(medicine_updated.name, "Meloxicam")
+    
+    def test_validate_medicine_invalid_dose(self):
+        data = {
+                "name": "Meloxicam",
+                "description": "Antiinflamatorio y analgesico",
+                "dose": "41",
+            }
+        
+        result = validate_medicine(data)
+        self.assertIn("La dosis debe estar entre 1 y 10", result.values())
+        
+    def test_validate_medicine_decimal_dose(self):
+        data = {
+                "name": "Meloxicam",
+                "description": "Antiinflamatorio y analgesico",
+                "dose": "4.1",
+            }
+        
+        result = validate_medicine(data)
+        self.assertIn("La dosis debe ser un numero entero", result.values())

@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.shortcuts import reverse
-from app.models import Client, Product, Pet, Provider, Vet, Speciality
+from app.models import Client, Product, Pet, Vet, Speciality, Provider, Medicine
+
 import datetime
 
 
@@ -458,3 +459,96 @@ class ProvidersTest(TestCase):
         )
 
         self.assertContains(response, "Por favor ingrese una dirección")
+
+class MedicinesTest(TestCase):
+    def test_repo_use_repo_template(self):
+        response = self.client.get(reverse("medicine_repo"))
+        self.assertTemplateUsed(response, "medicine/repository.html")
+    
+    def test_repo_display_all_medicines(self):
+        response = self.client.get(reverse("medicine_repo"))
+        self.assertTemplateUsed(response, "medicine/repository.html")
+    
+    def test_form_use_form_template(self):
+        response = self.client.get(reverse("medicine_form"))
+        self.assertTemplateUsed(response, "medicine/form.html")
+    
+    def test_can_create_medicine(self):
+        response = self.client.post(
+            reverse("medicine_form"),
+            data={
+                "name": "Rostrum",
+                "description": "Antibacteriano",
+                "dose": "2"
+            },
+        )
+        medicines = Medicine.objects.all()
+        self.assertEqual(len(medicines), 1)
+
+        self.assertEqual(medicines[0].name, "Rostrum")
+        self.assertEqual(medicines[0].description, "Antibacteriano")
+        self.assertEqual(medicines[0].dose, 2)
+
+        self.assertRedirects(response, reverse("medicine_repo"))
+        
+    def test_validation_errors_create_medicine(self):
+        response = self.client.post(
+            reverse("medicine_form"),
+            data={},
+        )
+
+        self.assertContains(response, "Por favor, ingrese un nombre de la medicina")
+        self.assertContains(response, "Por favor, ingrese una descripcion de la medicina")
+        self.assertContains(response, "Por favor, ingrese una cantidad de la dosis de la medicina")
+        
+    def test_should_response_with_404_status_if_medicine_doesnt_exists(self):
+        response = self.client.get(reverse("medicine_edit", kwargs={"id": 100}))
+        self.assertEqual(response.status_code, 404)
+        
+    def test_validation_decimal_dose(self):
+        response = self.client.post(
+            reverse("medicine_form"),
+            data={
+                "name": "Rostrum",
+                "description": "Antibacteriano",
+                "dose": "2.5",
+            },
+        )
+        
+        self.assertContains(response, "La dosis debe ser un numero entero")
+    
+    def test_validation_dose_out_of_range(self):
+        response = self.client.post(
+            reverse("medicine_form"),
+            data={
+                "name": "Rostrum",
+                "description": "Antibacteriano",
+                "dose": "88",
+            },
+        )
+        
+        self.assertContains(response, "La dosis debe estar entre 1 y 10")
+        
+    def test_edit_medicine_with_valid_data(self): 
+        medicine = Medicine.objects.create(
+            name="Rostrum",
+            description="Antibacteriano",
+            dose=8,
+        )
+
+        response = self.client.post(
+            reverse("medicine_form"),
+            data={
+                "id": medicine.id,
+                "name": medicine.name,
+                "description": medicine.description,
+                "dose": "3",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        editedMedicine = Medicine.objects.get(pk=medicine.id)
+        self.assertEqual(editedMedicine.name, medicine.name)
+        self.assertEqual(editedMedicine.description, medicine.description)
+        self.assertEqual(editedMedicine.dose, 3)
