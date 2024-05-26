@@ -52,13 +52,21 @@
                     </div>
                     <div>
                         <label for="dose" class="form-label">Dosis</label>
-                        <input type="number"
-                            id="dose"
-                            name="dose"
-                            class="form-control"
-                            value=""
-                            required/>
-
+                        {% if medicine.dose and not errors.dose %}
+                            <input type="number"
+                                id="dose"
+                                name="dose"
+                                class="form-control"
+                                value="{{medicine.dose}}"
+                                required/>
+                        {% else %}
+                            <input type="number"
+                                id="dose"
+                                name="dose"
+                                class="form-control"
+                                value=""
+                                required/>
+                        {% endif %}
                         {% if errors.dose %}
                             <div class="invalid-feedback">
                                 {{ errors.dose }}
