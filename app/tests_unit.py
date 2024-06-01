@@ -1,5 +1,5 @@
 from django.test import TestCase
-from app.models import Client, Pet, validate_pet, Vet, Speciality, validate_vet, Provider, validate_provider, validate_product, Medicine, validate_medicine
+from app.models import Client, Pet, validate_pet, Vet, Speciality, validate_vet, Provider, validate_provider, validate_product, Medicine, validate_medicine, Product
 import datetime
 
 
@@ -95,6 +95,78 @@ class TestValidateProduct(TestCase):
         errors = validate_product(data)
         self.assertIn("price", errors)
         self.assertEqual(errors["price"], "Por favor ingrese un precio")
+    
+    def test_negative_price(self):
+        data = {
+            "name": "ampicilina",
+            "type": "antibiotico",
+            "price": "-10"
+        }
+        errors = validate_product(data)
+        self.assertIn("price", errors)
+        self.assertEqual(errors["price"], "Por favor ingrese un precio mayor a cero")
+
+    def test_can_update_valid_price(self):
+        Product.save_product(
+            {
+                "name": "ampicilina",
+                "type": "antibiotico",
+                "price": "10",
+            }
+        )
+        product = Product.objects.get(pk=1)
+        self.assertEqual(product.name, "ampicilina")
+        product.update_product({
+            "name": "ampicilina",
+            "type": "antibiotico",
+            "birthday": "10",
+        })
+        product_updated = Product.objects.get(pk=1)
+        self.assertEqual(product_updated.name, "ampicilina")
+
+    def test_update_product_with_error(self): 
+        Product.save_product(
+            {
+                "name": "ampicilina",
+                "type": "antibiotico",
+                "price": "10",
+            }
+        )
+        product = Product.objects.get(pk=1)
+        self.assertEqual(product.name, "ampicilina")
+        product.update_product({"name": ""})
+        product_updated = Product.objects.get(pk=1)
+        self.assertEqual(product_updated.name, "ampicilina")
+
+    def test_update_product_with_error_price(self): 
+        data = {
+                "name": "ampicilina",
+                "type": "antibiotico",
+                "price": "-10",
+            }
+        
+        result = validate_product(data)
+        self.assertIn("Por favor ingrese un precio mayor a cero", result.values())
+
+    def test_validate_product_all_ok(self):
+        data = {
+                "name": "ampicilina",
+                "type": "antibiotico",
+                "price": "10",
+            }
+        result = validate_product(data)
+        self.assertDictEqual(result,{})
+
+    def test_validate_product_empty_data(self):
+        data = {
+                "name": "",
+                "type": "",
+                "price": "",
+            }
+        result = validate_product(data)
+        self.assertIn("Por favor ingrese un nombre",result.values())
+        self.assertIn("Por favor ingrese un tipo",result.values())
+        self.assertIn("Por favor ingrese un precio",result.values())
 
 class PetModelTest(TestCase):
     def test_can_create_and_get_pet(self):

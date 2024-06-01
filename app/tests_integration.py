@@ -130,6 +130,69 @@ class TestIntegration(TestCase):
         # Verifica que el producto haya sido creado en la base de datos
         self.assertTrue(Product.objects.filter(name="ampicilina").exists())
 
+    def test_price_empty(self):
+        response = self.client.post(
+            reverse("products_form"),
+            data={
+                "name": "ampicilina",
+                "type": "antibiotico",
+                "price": "",
+            },
+            follow=True
+        )
+
+        # Verifica que el formulario devuelva un error de precio vacío
+        self.assertContains(response, "Por favor ingrese un precio")
+        # Verifica que el producto no haya sido creado en la base de datos
+        self.assertFalse(Product.objects.filter(name="ampicilina").exists())
+
+    def test_price_zero(self):
+        response = self.client.post(
+            reverse("products_form"),
+            data={
+                "name": "ampicilina",
+                "type": "antibiotico",
+                "price": "0",
+            },
+            follow=True
+        )
+
+        # Verifica que el formulario devuelva un error de precio cero
+        self.assertContains(response, "Por favor ingrese un precio")
+        # Verifica que el producto no haya sido creado en la base de datos
+        self.assertFalse(Product.objects.filter(name="ampicilina").exists())
+
+    def test_negative_price(self):
+        response = self.client.post(
+            reverse('products_form'),
+            data={
+                "name": "ampicilina",
+                "type": "antibiotico",
+                "price": "-10",
+            }
+        )
+
+        # self.assertEqual(response.status_code, 400)
+        
+        # Verifica que el mensaje de error esté presente en la respuesta
+        self.assertContains(response, "Por favor ingrese un precio mayor a cero")
+        # Verifica que el producto no haya sido creado en la base de datos
+        self.assertFalse(Product.objects.filter(name="ampicilina").exists())
+
+    def test_valid_product_price(self):
+        response = self.client.post(reverse('products_form'), {
+            "name": "ampicilina",
+            "type": "antibiotico",
+            "price": "10"  # Precio mayor a 0, debería ser válido
+        })
+
+        # Verifica que la solicitud haya sido exitosa (se espera un redirect)
+        self.assertEqual(response.status_code, 302)
+
+        # Verifica que el producto haya sido creado en la base de datos
+        self.assertTrue(Product.objects.filter(name="ampicilina").exists())
+
+
 class PetsTest(TestCase):
     def test_repo_use_repo_template(self):
         response = self.client.get(reverse("pets_repo"))
