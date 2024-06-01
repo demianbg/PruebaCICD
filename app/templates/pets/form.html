@@ -52,13 +52,21 @@
                 </div>
                 <div>
                     <label for="birthday" class="form-label">Fecha de Nacimiento</label>
-                    <input type="date"
-                        id="birthday"
-                        name="birthday"
-                        class="form-control"
-                        value="{{pet.birthday.isoformat}}"
-                        required/>
-
+                    {% if errors and not errors.birthday %}
+                        <input type="date"
+                            id="birthday"
+                            name="birthday"
+                            class="form-control"
+                            value="{{pet.birthday}}"
+                            required/>
+                    {% else %}
+                        <input type="date"
+                            id="birthday"
+                            name="birthday"
+                            class="form-control"
+                            value="{{pet.birthday.isoformat}}"
+                            required/>
+                    {% endif %}
                     {% if errors.birthday %}
                         <div class="invalid-feedback">
                             {{ errors.birthday }}
