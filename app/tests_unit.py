@@ -4,7 +4,12 @@ import datetime
 
 
 class ClientModelTest(TestCase):
+    """
+    Pruebas para la gestión de clientes en el sistema.
+    """
+
     def test_can_create_and_get_client(self):
+        """Prueba que se pueda crear y obtener un cliente correctamente."""
         Client.save_client(
             {
                 "name": "Juan Sebastian Veron",
@@ -22,6 +27,7 @@ class ClientModelTest(TestCase):
         self.assertEqual(clients[0].email, "brujita75@hotmail.com")
 
     def test_can_update_client(self):
+        """Prueba que se pueda actualizar la información de un cliente correctamente."""
         Client.save_client(
             {
                 "name": "Juan Sebastian Veron",
@@ -46,6 +52,13 @@ class ClientModelTest(TestCase):
         self.assertEqual(client_updated.phone, "221555233")
 
     def test_update_client_with_error(self):
+        """
+    Prueba que el cliente no se actualice si se proporciona un número de teléfono vacío.
+
+    Se crea un cliente con un número de teléfono válido. Luego se intenta
+    actualizar el cliente con un número de teléfono vacío. Se verifica que
+    el número de teléfono del cliente no cambie después de intentar la actualización.
+        """
         Client.save_client(
             {
                 "name": "Juan Sebastian Veron",
@@ -66,8 +79,12 @@ class ClientModelTest(TestCase):
 
 
 class TestValidateProduct(TestCase):
+    """
+    Pruebas para la validación de productos.
+    """
 
     def test_valid_price(self):
+        """Prueba que verifica si el precio es válido."""
         data = {
             "name": "ampicilina",
             "type": "antibiotico",
@@ -77,6 +94,7 @@ class TestValidateProduct(TestCase):
         self.assertNotIn("price", errors)
     
     def test_price_equal_zero(self):
+        """Prueba que verifica si el precio es igual a cero."""
         data = {
             "name": "ampicilina",
             "type": "antibiotico",
@@ -87,6 +105,7 @@ class TestValidateProduct(TestCase):
         self.assertEqual(errors["price"], "Por favor ingrese un precio mayor a cero")
 
     def test_price_missing(self):
+        """Prueba que verifica si falta el precio."""
         data = {
             "name": "ampicilina",
             "type": "antibiotico",
@@ -97,6 +116,7 @@ class TestValidateProduct(TestCase):
         self.assertEqual(errors["price"], "Por favor ingrese un precio")
     
     def test_negative_price(self):
+        """Prueba que verifica si se proporciona un precio negativo."""
         data = {
             "name": "ampicilina",
             "type": "antibiotico",
@@ -107,6 +127,7 @@ class TestValidateProduct(TestCase):
         self.assertEqual(errors["price"], "Por favor ingrese un precio mayor a cero")
 
     def test_can_update_valid_price(self):
+        """Prueba que verifica si se puede actualizar un producto con un precio válido."""
         Product.save_product(
             {
                 "name": "ampicilina",
@@ -115,16 +136,20 @@ class TestValidateProduct(TestCase):
             }
         )
         product = Product.objects.get(pk=1)
+        
         self.assertEqual(product.name, "ampicilina")
+        
         product.update_product({
             "name": "ampicilina",
             "type": "antibiotico",
             "birthday": "10",
         })
+        
         product_updated = Product.objects.get(pk=1)
         self.assertEqual(product_updated.name, "ampicilina")
 
-    def test_update_product_with_error(self): 
+    def test_update_product_with_error(self):
+        """Prueba que verifica si ocurre un error al intentar actualizar un producto con datos incorrectos.""" 
         Product.save_product(
             {
                 "name": "ampicilina",
@@ -133,12 +158,16 @@ class TestValidateProduct(TestCase):
             }
         )
         product = Product.objects.get(pk=1)
+        
         self.assertEqual(product.name, "ampicilina")
+        
         product.update_product({"name": ""})
+        
         product_updated = Product.objects.get(pk=1)
         self.assertEqual(product_updated.name, "ampicilina")
 
-    def test_update_product_with_error_price(self): 
+    def test_update_product_with_error_price(self):
+        """Prueba que verifica si se produce un error al intentar actualizar un producto con un precio negativo.""" 
         data = {
                 "name": "ampicilina",
                 "type": "antibiotico",
@@ -149,27 +178,39 @@ class TestValidateProduct(TestCase):
         self.assertIn("Por favor ingrese un precio mayor a cero", result.values())
 
     def test_validate_product_all_ok(self):
+        """Prueba que verifica si la validación de datos del producto es exitosa cuando se proporcionan todos los datos necesarios."""
         data = {
                 "name": "ampicilina",
                 "type": "antibiotico",
                 "price": "10",
             }
+        
         result = validate_product(data)
+        
         self.assertDictEqual(result,{})
 
     def test_validate_product_empty_data(self):
+        """Prueba que verifica si se producen errores cuando no se proporcionan datos para el producto."""
         data = {
                 "name": "",
                 "type": "",
                 "price": "",
             }
+        
         result = validate_product(data)
+        
         self.assertIn("Por favor ingrese un nombre",result.values())
         self.assertIn("Por favor ingrese un tipo",result.values())
         self.assertIn("Por favor ingrese un precio",result.values())
 
+
 class PetModelTest(TestCase):
+    """
+    Pruebas para la gestión de mascotas en el sistema.
+    """
+
     def test_can_create_and_get_pet(self):
+        """Prueba que verifica si se puede crear y obtener una mascota correctamente."""
         Pet.save_pet(
             {
                 "name": "gatito",
@@ -179,7 +220,9 @@ class PetModelTest(TestCase):
         )
         pets = Pet.objects.all()
         self.assertEqual(len(pets), 1)
+    
     def test_can_update_pet(self):
+        """Prueba que verifica si se puede actualizar una mascota correctamente."""
         Pet.save_pet(
             {
                 "name": "gatito",
@@ -188,15 +231,19 @@ class PetModelTest(TestCase):
             }
         )
         pet = Pet.objects.get(pk=1)
+        
         self.assertEqual(pet.name, "gatito")
+        
         pet.update_pet({
             "name": "gato",
             "breed": "orange",
             "birthday": "2024-05-18",
         })
         pet_updated = Pet.objects.get(pk=1)
+        
         self.assertEqual(pet_updated.name, "gato")
-    def test_update_pet_with_error(self): 
+    def test_update_pet_with_error(self):
+        """Prueba que verifica si se produce un error al intentar actualizar una mascota con un campo de nombre vacío.""" 
         Pet.save_pet(
             {
                 "name": "gatito",
@@ -205,52 +252,81 @@ class PetModelTest(TestCase):
             }
         )
         pet = Pet.objects.get(pk=1)
+        
         self.assertEqual(pet.name, "gatito")
+        
         pet.update_pet({"name": ""})
         pet_updated = Pet.objects.get(pk=1)
+        
         self.assertEqual(pet_updated.name, "gatito")
+    
     def test_validate_pet_all_ok(self):
+        """Prueba que valida si todos los campos de una mascota están llenos correctamente."""
         data = {
                 "name": "gatito",
                 "breed": "orange",
                 "birthday": "2024-05-18",
             }
+        
         result = validate_pet(data)
+        
         self.assertDictEqual(result,{})
+    
     def test_validate_pet_empty_data(self):
+        """Prueba que verifica si se detectan errores cuando todos los campos de una mascota están vacíos."""
         data = {
                 "name": "",
                 "breed": "",
                 "birthday": "",
             }
+        
         result = validate_pet(data)
+        
         self.assertIn("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy",result.values())
         self.assertIn("Por favor ingrese un nombre",result.values())
         self.assertIn("Por favor ingrese una raza",result.values())
+    
     def test_validate_pet_invalid_birthday_today(self):
+        """Prueba que verifica si se detecta un error cuando la fecha de nacimiento de la mascota es la misma que la fecha actual."""
         date_now = datetime.date.today().strftime("%Y-%m-%d")
         data = {
             "name": "gatito",
                 "breed": "orange",
                 "birthday": date_now,
         }
+        
         result = validate_pet(data)
+        
         self.assertIn("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy",result.values())
+    
     def test_validate_pet_invalid_birthday_date_later_than_today(self):
+        """Prueba que verifica si se detecta un error cuando la fecha de nacimiento de la mascota es posterior a la fecha actual."""
         date_now = datetime.date.today()
         date_later = date_now + datetime.timedelta(days=1)
         date = date_later.strftime("%Y-%m-%d")
+        
         data = {
             "name": "gatito",
             "breed": "orange",
             "birthday": date,
         }
+        
         result = validate_pet(data)
+        
         self.assertIn("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy",result.values())
 
 
 class VetModelTest(TestCase):
+    """
+    Pruebas para la gestión de veterinarios en el sistema.
+    """
+
     def test_can_create_and_get_vet(self):
+        """
+        Prueba que verifica si se puede crear y obtener un veterinario correctamente.
+
+        Se asegura de que el veterinario se crea correctamente y que todos los campos tienen los valores esperados.
+        """
         speciality = "Urgencias"
         self.assertTrue(self.is_valid_speciality(speciality))
         
@@ -272,6 +348,12 @@ class VetModelTest(TestCase):
         self.assertEqual(vets[0].speciality, "Urgencias")
     
     def test_can_update_vet(self):
+        """
+    Prueba que verifica si se puede actualizar un veterinario correctamente.
+
+    Se asegura de que el veterinario se crea inicialmente con un número de teléfono,
+    luego se actualiza el número de teléfono y se verifica que la actualización sea exitosa.
+        """
         Vet.save_vet(
             {
                 "name": "Juan Sebastian Veron",
@@ -296,6 +378,13 @@ class VetModelTest(TestCase):
         self.assertEqual(vet_updated.phone, "221555233")
     
     def test_update_vet_with_error(self):
+        """
+    Prueba que verifica que un veterinario no se actualice si se proporcionan datos inválidos.
+
+    Se asegura de que el veterinario se crea inicialmente con un número de teléfono válido.
+    Luego, se intenta actualizar el veterinario con un número de teléfono vacío y se verifica
+    que el número de teléfono no se haya actualizado.
+        """
         Vet.save_vet(
             {
                 "name": "Juan Sebastian Veron",
@@ -314,9 +403,19 @@ class VetModelTest(TestCase):
         self.assertEqual(vet_updated.phone, "221555232")
 
     def is_valid_speciality(self, speciality):
+        """
+        Verifica si una especialidad dada es válida
+        """
         return speciality in [choice.value for choice in Speciality]
     
     def test_empty_speciality_error(self):
+        """
+    Prueba que verifica si se produce un error al intentar crear un veterinario con una especialidad vacía.
+
+    Se crea un diccionario de datos que representa un veterinario con una especialidad vacía.
+    Luego, se valida el diccionario de datos y se verifica que se encuentre el mensaje de error
+    correspondiente en los errores generados.
+        """
         data = {
             "name": "Juan Sebastian Veron",
             "email": "brujita75@hotmail.com",
@@ -328,9 +427,14 @@ class VetModelTest(TestCase):
 
         self.assertIn("Por favor seleccione una especialidad", errors.values())
 
+
 class ProviderModelTest(TestCase):
-    # TESTS para el alta de proveedores
+    """
+    Pruebas para la gestión de proveedores en el sistema.
+    """
+
     def test_can_create_and_get_provider(self):
+        """Prueba que verifica si se puede crear y obtener un proveedor."""
         Provider.save_provider(
             {
                 "name":"Demian",
@@ -343,6 +447,7 @@ class ProviderModelTest(TestCase):
         self.assertEqual(len(providers), 1)
 
     def test_validate_empty_address_when_create_provider(self):
+        """Prueba que valida una dirección vacía al crear un proveedor."""
         provider_data = {
                 "name":"Demian",
                 "email":"demian@utn.com",
@@ -354,6 +459,7 @@ class ProviderModelTest(TestCase):
         self.assertIn("Por favor ingrese una dirección", result.values())
 
     def test_validate_provider_with_everything_ok(self):
+        """Prueba la validación de un proveedor con todos los campos válidos."""
         provider_data = {
             "name":"Demian",
             "email":"demian@utn.com",
@@ -365,6 +471,7 @@ class ProviderModelTest(TestCase):
         self.assertDictEqual(result, {})
 
     def test_validate_empty_data(self):
+        """Prueba la validación de un proveedor con datos vacíos."""
         provider_data = {
             "name":"",
             "email":"",
@@ -376,8 +483,8 @@ class ProviderModelTest(TestCase):
         self.assertIn("Por favor ingrese un email", result.values())
         self.assertIn("Por favor ingrese una dirección", result.values())
 
-    # TESTS para modificar proveedores
     def test_can_update_provider(self):
+        """Prueba que verifica si se puede actualizar un proveedor."""
         Provider.save_provider(
             {
                 "name":"Demian",
@@ -401,6 +508,7 @@ class ProviderModelTest(TestCase):
         self.assertEqual(updated_provider.address, "Avenida Siempreviva 742")
 
     def test_cant_update_with_empty_address(self):
+        """Prueba que verifica que no se puede actualizar con una dirección vacía."""
         Provider.save_provider(
             {
                 "name":"Demian",
@@ -420,9 +528,15 @@ class ProviderModelTest(TestCase):
         updated_provider = Provider.objects.get(pk=1)
 
         self.assertEqual(updated_provider.address, "Calle falsa 123")
-        
+
+
 class MedicineModelTest(TestCase):
+    """
+    Pruebas para la gestión de medicamentos en el sistema.
+    """
+
     def test_can_create_and_get_medicine(self):
+        """Prueba que verifica si se puede crear y obtener un medicamento."""
         Medicine.save_medicine(
             {
                 "name": "Meloxicam",
@@ -438,6 +552,7 @@ class MedicineModelTest(TestCase):
         self.assertEqual(medicines[0].dose, 2)
         
     def test_can_update_medicine(self):
+        """Prueba que verifica si se puede actualizar un medicamento."""
         Medicine.save_medicine(
             {
                 "name": "Meloxicam",
@@ -462,6 +577,7 @@ class MedicineModelTest(TestCase):
         self.assertEqual(medicine_updated.dose, 8)
         
     def test_update_medicine_with_error(self):
+        """Prueba que verifica que no se puede actualizar un medicamento con un nombre vacío."""
         Medicine.save_medicine(
             {
                 "name": "Meloxicam",
@@ -480,6 +596,7 @@ class MedicineModelTest(TestCase):
         self.assertEqual(medicine_updated.name, "Meloxicam")
     
     def test_validate_medicine_invalid_dose(self):
+        """Prueba la validación de un medicamento con dosis inválida."""
         data = {
                 "name": "Meloxicam",
                 "description": "Antiinflamatorio y analgesico",
@@ -490,6 +607,7 @@ class MedicineModelTest(TestCase):
         self.assertIn("La dosis debe estar entre 1 y 10", result.values())
         
     def test_validate_medicine_decimal_dose(self):
+        """Prueba la validación de un medicamento con dosis decimal."""
         data = {
                 "name": "Meloxicam",
                 "description": "Antiinflamatorio y analgesico",
