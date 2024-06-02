@@ -23,10 +23,14 @@ class PlaywrightTestCase(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         """
-        Configuración inicial de la clase de prueba. Se ejecuta una vez antes de todas las pruebas.
-        Inicializa el navegador Playwright en modo headless o visible según la configuración.
-        """
+        Configura la clase antes de ejecutar las pruebas.
 
+        Lanza el navegador Chromium en modo headless si la variable de clase 'headless' está configurada como True
+        y establece una velocidad de ejecución más lenta si la variable de clase 'slow_mo' está configurada.
+
+        Raises:
+            RuntimeError: Si el navegador no puede ser lanzado.
+        """
         super().setUpClass()
         cls.browser: Browser = playwright.chromium.launch(
             headless=headless, slow_mo=int(slow_mo)
@@ -35,28 +39,28 @@ class PlaywrightTestCase(StaticLiveServerTestCase):
     @classmethod
     def tearDownClass(cls):
         """
-        Limpieza final de la clase de prueba. Se ejecuta una vez después de todas las pruebas.
-        Cierra el navegador Playwright.
-        """
+        Realiza limpieza después de ejecutar todas las pruebas de la clase.
 
+        Cierra el navegador Chromium.
+        """
         super().tearDownClass()
         cls.browser.close()
 
     def setUp(self):
         """
-        Configuración inicial antes de cada prueba individual.
-        Abre una nueva página del navegador para cada prueba.
-        """
+    Prepara el entorno de la prueba antes de ejecutar cada método de prueba.
 
+    Crea una nueva página en el navegador para realizar las pruebas.
+        """
         super().setUp()
         self.page = self.browser.new_page()
 
     def tearDown(self):
         """
-        Limpieza después de cada prueba individual.
-        Cierra la página del navegador utilizada en la prueba.
-        """
+    Realiza la limpieza del entorno de la prueba después de ejecutar cada método de prueba.
 
+    Cierra la página del navegador.
+        """
         super().tearDown()
         self.page.close()
 
@@ -67,10 +71,7 @@ class HomeTestCase(PlaywrightTestCase):
     """
 
     def test_should_have_navbar_with_links(self):
-        """
-        Verifica que la barra de navegación tenga los enlaces correctos.
-        """
-
+        """Verifica si la barra de navegación contiene enlaces válidos."""
         self.page.goto(self.live_server_url)
 
         navbar_home_link = self.page.get_by_test_id("navbar-Home")
@@ -85,11 +86,8 @@ class HomeTestCase(PlaywrightTestCase):
         expect(navbar_clients_link).to_have_text("Clientes")
         expect(navbar_clients_link).to_have_attribute("href", reverse("clients_repo"))
 
-    def test_should_have_home_cards_with_links(self): 
-        """
-        Verifica que las tarjetas de la página de inicio tengan los enlaces correctos.
-        """
-
+    def test_should_have_home_cards_with_links(self):
+        """Verifica si los 'cards' de la página principal tienen enlaces válidos.""" 
         self.page.goto(self.live_server_url)
 
         home_clients_link = self.page.get_by_test_id("home-Clientes")
@@ -105,19 +103,13 @@ class ClientsRepoTestCase(PlaywrightTestCase):
     """
 
     def test_should_show_message_if_table_is_empty(self):
-        """
-        Verifica que se muestre un mensaje si la tabla está vacía.
-        """
-
+        """Verifica si se muestra un mensaje cuando la tabla está vacía."""
         self.page.goto(f"{self.live_server_url}{reverse('clients_repo')}")
 
         expect(self.page.get_by_text("No existen clientes")).to_be_visible()
 
     def test_should_show_clients_data(self):
-        """
-        Verifica que se muestren los datos de los clientes correctamente.
-        """
-         
+        """Verifica si se muestran los datos de los clientes."""
         Client.objects.create(
             name="Juan Sebastián Veron",
             address="13 y 44",
@@ -147,10 +139,7 @@ class ClientsRepoTestCase(PlaywrightTestCase):
         expect(self.page.get_by_text("goleador@gmail.com")).to_be_visible()
 
     def test_should_show_add_client_action(self):
-        """
-        Verifica que se muestre la acción de agregar cliente.
-        """
-
+        """Verifica si se muestra la acción para agregar un nuevo cliente."""
         self.page.goto(f"{self.live_server_url}{reverse('clients_repo')}")
 
         add_client_action = self.page.get_by_role(
@@ -159,10 +148,7 @@ class ClientsRepoTestCase(PlaywrightTestCase):
         expect(add_client_action).to_have_attribute("href", reverse("clients_form"))
 
     def test_should_show_client_edit_action(self):
-        """
-        Verifica que se muestre la acción de editar cliente.
-        """
-
+        """Verifica si se muestra la acción para editar un cliente."""
         client = Client.objects.create(
             name="Juan Sebastián Veron",
             address="13 y 44",
@@ -178,10 +164,7 @@ class ClientsRepoTestCase(PlaywrightTestCase):
         )
 
     def test_should_show_client_delete_action(self):
-        """
-        Verifica que se muestre la acción de eliminar cliente.
-        """
-
+        """Verifica si se muestra la acción para eliminar un cliente."""
         client = Client.objects.create(
             name="Juan Sebastián Veron",
             address="13 y 44",
@@ -203,10 +186,7 @@ class ClientsRepoTestCase(PlaywrightTestCase):
         expect(edit_form.get_by_role("button", name="Eliminar")).to_be_visible()
 
     def test_should_can_be_able_to_delete_a_client(self):
-        """
-        Verifica que se pueda eliminar un cliente.
-        """
-
+        """Verifica si se puede eliminar un cliente."""
         Client.objects.create(
             name="Juan Sebastián Veron",
             address="13 y 44",
@@ -236,10 +216,7 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
     """
 
     def test_should_be_able_to_create_a_new_client(self):
-        """
-        Verifica que se pueda crear un nuevo cliente.
-        """
-
+        """Verifica si se puede crear un nuevo cliente."""
         self.page.goto(f"{self.live_server_url}{reverse('clients_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -257,10 +234,7 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         expect(self.page.get_by_text("13 y 44")).to_be_visible()
 
     def test_should_view_errors_if_form_is_invalid(self):
-        """
-        Verifica que se muestren errores si el formulario es inválido.
-        """
-
+        """Verifica si se muestran errores si el formulario es inválido."""
         self.page.goto(f"{self.live_server_url}{reverse('clients_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -288,10 +262,7 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
         ).to_be_visible()
 
     def test_should_be_able_to_edit_a_client(self):
-        """
-        Verifica que se pueda editar un cliente existente.
-        """
-
+        """Verifica si se puede editar un cliente."""
         client = Client.objects.create(
             name="Juan Sebastián Veron",
             address="13 y 44",
@@ -331,10 +302,7 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
     """
 
     def test_should_be_able_to_create_a_new_product(self):
-        """
-        Verifica que se pueda crear un nuevo producto.
-        """
-
+        """Verifica si se puede crear un nuevo producto."""
         self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -350,10 +318,7 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
         expect(self.page.get_by_text("10")).to_be_visible()
 
     def test_should_view_errors_if_price_is_zero(self):
-        """
-        Verifica que se muestren errores si el precio del producto es cero.
-        """
-
+        """Verifica si se muestran errores si el precio es cero."""
         self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -376,10 +341,7 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
 
     
     def test_should_view_errors_if_price_is_negative(self):
-        """
-        Verifica que se muestren errores si el precio del producto es negativo.
-        """
-
+        """Verifica si se muestran errores si el precio es negativo."""
         self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -397,10 +359,7 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
 
 
     def test_should_view_errors_if_price_is_empty(self):
-        """
-        Verifica que se muestren errores si el precio del producto está vacío.
-        """
-
+        """Verifica si se muestran errores si el campo de precio está vacío."""
         self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -417,8 +376,9 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
     def test_should_not_allow_editing_product_with_empty_or_zero_price(self):
         """
         Verifica que no se permita editar un producto con precio cero o vacío.
+
+        Se crea un producto inicialmente válido con un precio de 10.
         """
-    
         product = Product.objects.create(
             name="ampicilina",
             type="antibiotico",
@@ -443,9 +403,12 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
 
     def test_should_not_allow_editing_product_with_negative_price(self):
         """
-        Verifica que no se permita editar un producto con precio negativo.
-        """
+    Verifica que no se permita editar un producto con un precio negativo.
 
+    Se crea un producto inicialmente válido con un precio de 10.
+    Luego se intenta editar el producto con un precio negativo y se verifica que aparezca el mensaje de error correspondiente.
+        """
+        # Crear un producto inicialmente válido
         product = Product.objects.create(
             name="ampicilina",
             type="antibiotico",
@@ -473,7 +436,6 @@ class PetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se muestre un mensaje si la tabla de mascotas está vacía.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
         expect(self.page.get_by_text("No existen mascotas")).to_be_visible()
    
@@ -481,7 +443,6 @@ class PetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se muestren los datos de las mascotas.
         """
-
         Pet.objects.create(
             name="gatito",
             breed="orange",
@@ -507,7 +468,6 @@ class PetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se muestre la acción para agregar una nueva mascota.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
         add_client_action = self.page.get_by_role(
             "link", name="Nueva Mascota", exact=False
@@ -519,7 +479,6 @@ class PetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se muestre la acción para editar una mascota.
         """
-
         pet = Pet.objects.create(
             name="gatito",
             breed="orange",
@@ -537,7 +496,6 @@ class PetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se muestre la acción para eliminar una mascota.
         """
-
         pet = Pet.objects.create(
             name="gatito",
             breed="orange",
@@ -562,7 +520,6 @@ class PetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se pueda eliminar una mascota.
         """
-
         Pet.objects.create(
             name="gatito",
             breed="orange",
@@ -592,9 +549,8 @@ class PetCreateEditTestCase(PlaywrightTestCase):
 
     def test_should_be_able_to_create_a_new_pet(self):
         """
-        Verifica que se pueda crear una nueva mascota.
+        Verifica que se pueda crear una nueva mascota correctamente.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
         
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -610,9 +566,8 @@ class PetCreateEditTestCase(PlaywrightTestCase):
     
     def test_should_view_errors_if_form_is_invalid(self):
         """
-        Verifica que se muestren errores si el formulario es inválido.
+        Verifica que se muestren los errores si el formulario es inválido.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
         
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -634,9 +589,8 @@ class PetCreateEditTestCase(PlaywrightTestCase):
     
     def test_should_view_error_if_birthday_is_today(self):
         """
-        Verifica que se muestre un error si la fecha de nacimiento es hoy.
+        Verifica que se muestre un error si la fecha de nacimiento es la fecha actual.
         """
-
         date_now = datetime.date.today().strftime("%Y-%m-%d")
         
         self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
@@ -656,12 +610,10 @@ class PetCreateEditTestCase(PlaywrightTestCase):
         self.page.get_by_role("button", name="Guardar").click()
         
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).not_to_be_visible()
-    
-    def test_should_view_error_if_birthday_is_later_than_today(self): 
+    def test_should_view_error_if_birthday_is_later_than_today(self):
         """
-        Verifica que se muestre un error si la fecha de nacimiento es posterior a hoy.
-        """
-
+        Verifica que se muestre un error si la fecha de nacimiento es posterior a la fecha actual.
+        """ 
         date_now = datetime.date.today()
         date_later = date_now + datetime.timedelta(days=1)
         date = date_later.strftime("%Y-%m-%d")
@@ -686,9 +638,8 @@ class PetCreateEditTestCase(PlaywrightTestCase):
     
     def test_should_be_able_to_edit_a_pet(self):
         """
-        Verifica que se pueda editar una mascota.
+        Verifica que se pueda editar una mascota correctamente.
         """
-
         pet = Pet.objects.create(
             name="gatito",
             breed="orange",
@@ -720,7 +671,6 @@ class PetCreateEditTestCase(PlaywrightTestCase):
         """
         Verifica que no se pueda editar una mascota si el formulario es inválido.
         """
-
         pet = Pet.objects.create(
             name="gatito",
             breed="orange",
@@ -765,7 +715,6 @@ class PetCreateEditTestCase(PlaywrightTestCase):
         """
         Verifica que no se pueda editar una mascota si la fecha de nacimiento es hoy.
         """
-
         pet = Pet.objects.create(
             name="gatito",
             breed="orange",
@@ -807,7 +756,6 @@ class PetCreateEditTestCase(PlaywrightTestCase):
         """
         Verifica que no se pueda editar una mascota si la fecha de nacimiento es posterior a hoy.
         """
-
         pet = Pet.objects.create(
             name="gatito",
             breed="orange",
@@ -859,7 +807,6 @@ class VetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se muestre un mensaje si la tabla está vacía.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('vets_repo')}")
         expect(self.page.get_by_text("No existen veterinarios")).to_be_visible()
     
@@ -867,7 +814,6 @@ class VetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se muestren los datos de los veterinarios correctamente.
         """
-
         Vet.objects.create(
             name="Juan Sebastián Veron",
             email="brujita75@hotmail.com",
@@ -897,9 +843,8 @@ class VetsRepoTestCase(PlaywrightTestCase):
     
     def test_should_show_add_vet_action(self):
         """
-        Verifica que se muestre la acción de agregar veterinario.
+        Verifica que se muestre la acción para agregar un veterinario.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('vets_repo')}")
         
         add_vet_action = self.page.get_by_role(
@@ -910,9 +855,8 @@ class VetsRepoTestCase(PlaywrightTestCase):
     
     def test_should_show_vet_edit_action(self):
         """
-        Verifica que se muestre la acción de editar veterinario.
+        Verifica que se muestre la acción para editar un veterinario.
         """
-
         vet = Vet.objects.create(
             name="Juan Sebastián Veron",
             email="brujita75@hotmail.com",
@@ -930,9 +874,8 @@ class VetsRepoTestCase(PlaywrightTestCase):
     
     def test_should_show_vet_delete_action(self):
         """
-        Verifica que se muestre la acción de eliminar veterinario.
+        Verifica que se muestre la acción para eliminar un veterinario.
         """
-
         vet = Vet.objects.create(
             name="Juan Sebastián Veron",
             email="brujita75@hotmail.com",
@@ -961,7 +904,6 @@ class VetsRepoTestCase(PlaywrightTestCase):
         """
         Verifica que se pueda eliminar un veterinario.
         """
-
         Vet.objects.create(
             name="Juan Sebastián Veron",
             email="brujita75@hotmail.com",
@@ -995,7 +937,6 @@ class VetCreateEditTestCase(PlaywrightTestCase):
         """
         Verifica que se pueda crear un nuevo veterinario.
         """
-        
         self.page.goto(f"{self.live_server_url}{reverse('vets_form')}")
         
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -1014,9 +955,8 @@ class VetCreateEditTestCase(PlaywrightTestCase):
     
     def test_should_view_errors_if_form_is_invalid(self):
         """
-        Verifica que se muestren errores si el formulario es inválido.
+        Verifica que se muestren errores si el formulario de creación de veterinario es inválido.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('vets_form')}")
         
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -1041,9 +981,8 @@ class VetCreateEditTestCase(PlaywrightTestCase):
     
     def test_should_be_able_to_edit_a_vet(self):
         """
-        Verifica que se pueda editar un veterinario.
+        Verifica que se pueda editar un veterinario existente.
         """
-
         vet = Vet.objects.create(
             name="Juan Sebastián Veron",
             email="brujita75@hotmail.com",
@@ -1082,7 +1021,6 @@ class VetCreateEditTestCase(PlaywrightTestCase):
         """
         Verifica que se pueda crear un nuevo veterinario con una especialidad válida.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('vets_form')}")
         
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -1109,18 +1047,16 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
      
     def test_should_show_message_if_table_is_empty(self):
         """
-        Verifica que se muestre un mensaje si la tabla está vacía.
+        Verifica que se muestre un mensaje si la tabla de proveedores está vacía.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('providers_repo')}")
 
         expect(self.page.get_by_text("No existen proveedores")).to_be_visible()
 
     def test_should_show_providers_data(self):
         """
-        Verifica que se muestren los datos de los proveedores correctamente.
+        Verifica que se muestren los datos de los proveedores en la tabla.
         """
-
         Provider.objects.create(
             name = "Bogado",
             email = "demian@utn.com",
@@ -1147,9 +1083,8 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
 
     def test_should_show_add_provider_action(self):
         """
-        Verifica que se muestre la acción de agregar proveedor.
+        Verifica que se muestre la acción para agregar un nuevo proveedor.
         """
-
         self.page.goto(f"{self.live_server_url}{reverse('providers_repo')}")
 
         add_provider_action = self.page.get_by_role(
@@ -1160,9 +1095,8 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
 
     def test_should_show_provider_edit_action(self):
         """
-        Verifica que se muestre la acción de editar proveedor.
+        Verifica que se muestre la acción para editar un proveedor.
         """
-
         provider = Provider.objects.create(
             name="Demian",
             email="demian@utn.com",
@@ -1178,9 +1112,8 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
 
     def test_should_show_provider_delete_action(self):
         """
-        Verifica que se muestre la acción de eliminar proveedor.
+        Verifica que se muestre la acción para eliminar un proveedor y que el formulario de eliminación esté correctamente configurado.
         """
-
         provider = Provider.objects.create(
             name="Demian",
             email="demian@utn.com",
@@ -1202,9 +1135,8 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
 
     def test_should_be_able_to_delete_a_provider(self):
         """
-        Verifica que se pueda eliminar un proveedor.
+        Verifica que se pueda eliminar un proveedor y que desaparezca de la lista después de eliminarlo.
         """
-
         Provider.objects.create(
             name="Bogado",
             email="demian@utn.com",
@@ -1216,6 +1148,9 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
         expect(self.page.get_by_text("Bogado")).to_be_visible()
 
         def is_delete_response(response):
+            """
+            buscar la URL de la vista de eliminación de proveedores (providers_delete) en la URL de la respuesta.
+            """
             return response.url.find(reverse("providers_delete"))
 
         with self.page.expect_response(is_delete_response) as response_info:
@@ -1234,9 +1169,13 @@ class ProviderCreateEditTestCase(PlaywrightTestCase):
 
     def test_should_be_able_to_create_a_new_provider(self):
         """
-        Verifica que se pueda crear un nuevo proveedor correctamente.
-        """
+        Verifica que un proveedor se pueda crear correctamente llenando el formulario con información válida.
 
+        - Accede a la página de creación de proveedores.
+        - Llena los campos del formulario con información válida: nombre, email y dirección.
+        - Haz clic en el botón "Guardar".
+        - Verifica que la información del proveedor recién creado sea visible en la página.
+        """
         self.page.goto(f"{self.live_server_url}{reverse('providers_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible
@@ -1253,9 +1192,14 @@ class ProviderCreateEditTestCase(PlaywrightTestCase):
 
     def test_should_view_errors_if_form_is_invalid(self):
         """
-        Verifica que se muestren los errores si el formulario es inválido.
-        """
+        Verifica que se muestren los mensajes de error adecuados cuando se intenta enviar un formulario con información inválida.
 
+        - Accede a la página de creación de proveedores.
+        - Haz clic en el botón "Guardar" sin completar ningún campo del formulario.
+        - Verifica que se muestren los mensajes de error correspondientes.
+        - Completa el formulario con información válida.
+        - Verifica que los mensajes de error desaparezcan.
+        """
         self.page.goto(f"{self.live_server_url}{reverse('providers_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible
@@ -1278,9 +1222,14 @@ class ProviderCreateEditTestCase(PlaywrightTestCase):
 
     def test_should_view_error_if_address_is_empty(self):
         """
-        Verifica que se muestre un error si la dirección está vacía.
-        """
+        Verifica que se muestre un mensaje de error si el campo de dirección está vacío.
 
+        - Accede a la página de creación de proveedores.
+        - Haz clic en el botón "Guardar" sin completar el campo de dirección.
+        - Verifica que se muestre el mensaje de error correspondiente.
+        - Completa el campo de dirección.
+        - Verifica que el mensaje de error desaparezca.
+        """
         self.page.goto(f"{self.live_server_url}{reverse('providers_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible
@@ -1302,9 +1251,16 @@ class ProviderCreateEditTestCase(PlaywrightTestCase):
 
     def test_should_be_able_to_edit_a_provider(self):
         """
-        Verifica que se pueda editar un proveedor correctamente.
+        Verifica que se pueda editar un proveedor existente y que los cambios se reflejen correctamente.
+
+        - Crea un proveedor en la base de datos.
+        - Accede a la página de edición del proveedor recién creado.
+        - Modifica el nombre, el email y la dirección del proveedor.
+        - Haz clic en el botón "Guardar" para guardar los cambios.
+        - Verifica que la información anterior del proveedor no sea visible en la página.
+        - Verifica que la información actualizada del proveedor sea visible en la página.
+        - Verifica que el enlace de edición del proveedor todavía tenga la URL correcta.
         """
-        
         provider = Provider.objects.create(
             name = "Bogado",
             email = "demian@utn.com",
@@ -1335,9 +1291,20 @@ class ProviderCreateEditTestCase(PlaywrightTestCase):
 
     def test_should_not_be_able_to_edit_provider_if_form_is_invalid(self):
         """
-        Verifica que no se pueda editar un proveedor si el formulario es inválido.
-        """
+        Verifica que no se pueda editar un proveedor si el formulario de edición es inválido.
 
+        - Crea un proveedor en la base de datos.
+        - Accede a la página de edición del proveedor recién creado.
+        - Deja los campos de nombre y email vacíos y llena el campo de dirección.
+        - Haz clic en el botón "Guardar".
+        - Verifica que se muestren los mensajes de error indicando que los campos de nombre y email son obligatorios.
+        - Llena los campos de nombre, email y dirección con valores válidos.
+        - Haz clic en el botón "Guardar".
+        - Verifica que los mensajes de error ya no son visibles.
+        - Verifica que la información anterior del proveedor no sea visible en la página.
+        - Verifica que la información actualizada del proveedor sea visible en la página.
+        - Verifica que el enlace de edición del proveedor todavía tenga la URL correcta.
+        """
         provider = Provider.objects.create(
             name = "Bogado",
             email = "demian@utn.com",
@@ -1383,8 +1350,18 @@ class ProviderCreateEditTestCase(PlaywrightTestCase):
     def test_should_not_be_able_to_edit_a_provider_if_address_is_empty(self):
         """
         Verifica que no se pueda editar un proveedor si la dirección está vacía.
-        """
 
+        - Crea un proveedor en la base de datos.
+        - Accede a la página de edición del proveedor recién creado.
+        - Deja el campo de dirección vacío y llena los campos de nombre y email con los valores del proveedor.
+        - Haz clic en el botón "Guardar".
+        - Verifica que se muestre un mensaje de error indicando que el campo de dirección es obligatorio.
+        - Llena el campo de dirección con un valor válido y haz clic en el botón "Guardar".
+        - Verifica que el mensaje de error ya no sea visible.
+        - Verifica que el nombre, el email y la dirección actualizada del proveedor sean visibles en la página.
+        - Verifica que la dirección anterior del proveedor no sea visible en la página.
+        - Verifica que el enlace de edición del proveedor todavía tenga la URL correcta.
+        """
         provider = Provider.objects.create(
             name = "Bogado",
             email = "demian@utn.com",
@@ -1429,9 +1406,14 @@ class MedicineCreateEditTestCase(PlaywrightTestCase):
 
     def test_should_be_able_to_create_a_new_medicine(self):
         """
-        Verifica que se pueda crear una nueva medicina.
-        """
+        Verifies the ability to create a new medicine.
 
+        - Navigates to the medicine creation form page.
+        - Checks if the form is visible.
+        - Fills in the name, description, and dosage fields.
+        - Clicks the "Guardar" (Save) button.
+        - Verifies that the created medicine's name, description, and dosage are visible on the page.
+        """
         self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible
@@ -1448,9 +1430,16 @@ class MedicineCreateEditTestCase(PlaywrightTestCase):
     
     def test_should_view_errors_if_form_is_invalid(self):
         """
-        Verifica que se muestren errores si el formulario es inválido.
-        """
+        Verifica que se muestren errores cuando el formulario para crear un medicamento es inválido.
 
+        - Navega a la página del formulario de creación de medicamentos.
+        - Verifica si el formulario es visible.
+        - Hace clic en el botón "Guardar" sin completar ningún campo.
+        - Verifica que los mensajes de error para el nombre, la descripción y la dosis faltantes estén visibles.
+        - Completa los campos de nombre y dosis pero deja vacío el campo de descripción.
+        - Hace clic en el botón "Guardar" nuevamente.
+        - Verifica que el mensaje de error para la descripción faltante esté visible.
+        """
         self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible()
@@ -1473,9 +1462,16 @@ class MedicineCreateEditTestCase(PlaywrightTestCase):
         
     def test_should_be_able_to_edit_a_medicine(self):
         """
-        Verifica que se pueda editar una medicina.
-        """
+        Verifica que se pueda editar un medicamento existente.
 
+        - Crea un medicamento de prueba en la base de datos.
+        - Navega a la página de edición del medicamento recién creado.
+        - Rellena los campos de nombre, descripción y dosis con nuevos valores.
+        - Hace clic en el botón "Guardar".
+        - Verifica que los detalles anteriores del medicamento no estén visibles.
+        - Verifica que los nuevos detalles del medicamento editado estén visibles.
+        - Verifica que el enlace de edición del medicamento tenga el atributo href correcto.
+        """
         medicine = Medicine.objects.create(
             name="Bravecto",
             description="Previene y elimina parasitos externos",
@@ -1506,9 +1502,15 @@ class MedicineCreateEditTestCase(PlaywrightTestCase):
     
     def test_should_not_be_able_to_create_a_new_medicine_if_dose_is_empty(self):
         """
-        Verifica que no se pueda crear una nueva medicina si la dosis está vacía.
-        """
+        Verifica que no se pueda crear un nuevo medicamento si la dosis está vacía.
 
+        - Navega a la página de formulario para agregar un nuevo medicamento.
+        - Rellena los campos de nombre y descripción con valores válidos.
+        - Deja el campo de dosis vacío.
+        - Hace clic en el botón "Guardar".
+        - Verifica que no se muestren mensajes de error para el nombre y la descripción.
+        - Verifica que se muestre un mensaje de error para el campo de dosis.
+        """
         self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible
@@ -1525,9 +1527,15 @@ class MedicineCreateEditTestCase(PlaywrightTestCase):
     
     def test_should_not_be_able_to_create_a_new_medicine_if_dose_is_decimal(self):
         """
-        Verifica que no se pueda crear una nueva medicina si la dosis es un número decimal.
-        """
+        Verifica que no se pueda crear un nuevo medicamento si la dosis es un número decimal.
 
+        - Navega a la página de formulario para agregar un nuevo medicamento.
+        - Rellena los campos de nombre y descripción con valores válidos.
+        - Ingresa una dosis decimal en el campo correspondiente.
+        - Hace clic en el botón "Guardar".
+        - Verifica que no se muestren mensajes de error para el nombre y la descripción.
+        - Verifica que se muestre un mensaje de error indicando que la dosis debe ser un número entero.
+        """
         self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible
@@ -1544,9 +1552,15 @@ class MedicineCreateEditTestCase(PlaywrightTestCase):
         
     def test_should_not_be_able_to_create_a_new_medicine_if_dose_is_out_of_range(self):
         """
-        Verifica que no se pueda crear una nueva medicina si la dosis está fuera de rango.
+        Verifica que no se pueda crear un nuevo medicamento si la dosis está fuera del rango permitido.
+
+        - Navega a la página de formulario para agregar un nuevo medicamento.
+        - Rellena los campos de nombre y descripción con valores válidos.
+        - Ingresa una dosis que está fuera del rango permitido en el campo correspondiente.
+        - Hace clic en el botón "Guardar".
+        - Verifica que no se muestren mensajes de error para el nombre y la descripción.
+        - Verifica que se muestre un mensaje de error indicando que la dosis debe estar entre 1 y 10.
         """
-        
         self.page.goto(f"{self.live_server_url}{reverse('medicine_form')}")
 
         expect(self.page.get_by_role("form")).to_be_visible

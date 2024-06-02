@@ -3,6 +3,15 @@ from enum import Enum
 import datetime
 
 def validate_client(data):
+    """
+    Valida los datos de un cliente.
+
+    Args:
+        data (dict): Un diccionario que contiene los datos del cliente.
+
+    Returns:
+        dict: Un diccionario que contiene los errores encontrados durante la validación.
+    """
     errors = {}
 
     name = data.get("name", "")
@@ -24,6 +33,15 @@ def validate_client(data):
 
 
 def validate_provider(data):
+    """
+    Valida los datos de un proveedor.
+
+    Args:
+        data (dict): Un diccionario que contiene los datos del proveedor.
+
+    Returns:
+        dict: Un diccionario que contiene los errores encontrados durante la validación.
+    """
     errors = {}
     
     name = data.get("name", "")
@@ -44,6 +62,15 @@ def validate_provider(data):
     return errors
 
 def validate_medicine(data):
+    """
+    Valida los datos de un medicamento.
+
+    Args:
+        data (dict): Un diccionario que contiene los datos del medicamento.
+
+    Returns:
+        dict: Un diccionario que contiene los errores encontrados durante la validación.
+    """
     errors = {}
 
     name = data.get("name", "")
@@ -70,6 +97,15 @@ def validate_medicine(data):
     return errors
     
 def validate_product(data):
+    """
+    Valida los datos de un producto.
+
+    Args:
+        data (dict): Un diccionario que contiene los datos del producto.
+
+    Returns:
+        dict: Un diccionario que contiene los errores encontrados durante la validación.
+    """
     errors={}
 
     name = data.get("name","")
@@ -96,6 +132,15 @@ def validate_product(data):
 
 
 def validate_pet(data):
+    """
+    Valida los datos de una mascota.
+
+    Args:
+        data (dict): Un diccionario que contiene los datos de la mascota.
+
+    Returns:
+        dict: Un diccionario que contiene los errores encontrados durante la validación.
+    """
     errors={}
 
     name = data.get("name","")
@@ -116,6 +161,15 @@ def validate_pet(data):
     return errors
 
 def validate_vet(data):
+    """
+    Valida los datos de un veterinario.
+
+    Args:
+        data (dict): Un diccionario que contiene los datos del veterinario.
+
+    Returns:
+        dict: Un diccionario que contiene los errores encontrados durante la validación.
+    """
     errors = {}
 
     name = data.get("name", "")
@@ -157,7 +211,7 @@ class Client(models.Model):
 
     def __str__(self):
         """
-        Retorna una representación en cadena del cliente.
+        Retorna una representación en string del cliente, que es su nombre.
 
         Returns:
             str: Nombre del cliente.
@@ -170,13 +224,11 @@ class Client(models.Model):
         Guarda un nuevo cliente en la base de datos.
 
         Args:
-            client_data (dict): Diccionario con los datos del cliente.
+            client_data (dict): Un diccionario con los datos del cliente.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se guardó correctamente el cliente y, en caso de errores, los mensajes de error.
         """
-         
         errors = validate_client(client_data)
 
         if len(errors.keys()) > 0:
@@ -193,16 +245,14 @@ class Client(models.Model):
 
     def update_client(self, client_data):
         """
-        Actualiza los datos del cliente existente.
+        Actualiza los datos de un cliente existente en la base de datos.
 
         Args:
-            client_data (dict): Diccionario con los datos del cliente a actualizar.
+            client_data (dict): Un diccionario con los datos actualizados del cliente.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se actualizó correctamente el cliente y, en caso de errores, los mensajes de error.
         """
-
         errors = validate_client(client_data)
 
         if len(errors.keys()) > 0:
@@ -233,7 +283,7 @@ class Provider (models.Model):
 
     def __str__(self):
         """
-        Retorna una representación en cadena del proveedor.
+        Retorna una representación en string del proveedor, que es su nombre.
 
         Returns:
             str: Nombre del proveedor.
@@ -246,11 +296,10 @@ class Provider (models.Model):
         Guarda un nuevo proveedor en la base de datos.
 
         Args:
-            provider_data (dict): Diccionario con los datos del proveedor.
+            provider_data (dict): Un diccionario con los datos del proveedor.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se guardó correctamente el proveedor y, en caso de errores, los mensajes de error.
         """
         errors = validate_provider(provider_data)
 
@@ -267,16 +316,14 @@ class Provider (models.Model):
 
     def update_provider(self, provider_data):
         """
-        Actualiza los datos del proveedor existente.
+        Actualiza los datos de un proveedor existente en la base de datos.
 
         Args:
-            provider_data (dict): Diccionario con los datos del proveedor a actualizar.
+            provider_data (dict): Un diccionario con los datos actualizados del proveedor.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se actualizó correctamente el proveedor y, en caso de errores, los mensajes de error.
         """
-
         errors = validate_provider(provider_data)
 
         if len(errors.keys()) > 0:
@@ -305,12 +352,8 @@ class Medicine(models.Model):
 
     def __str__(self):
         """
-        Retorna una representación en cadena del medicamento.
-
-        Returns:
-            str: Nombre del medicamento.
+        Retorna una representación en string del medicamento, que es su nombre.
         """
-
         return self.name
 
     @classmethod
@@ -319,13 +362,11 @@ class Medicine(models.Model):
         Guarda un nuevo medicamento en la base de datos.
 
         Args:
-            medicine_data (dict): Diccionario con los datos del medicamento.
+            medicine_data (dict): Un diccionario con los datos del medicamento.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se guardó correctamente el medicamento y, en caso de errores, los mensajes de error.
         """
-
         errors = validate_medicine(medicine_data)
 
         if len(errors.keys()) > 0:
@@ -340,16 +381,14 @@ class Medicine(models.Model):
 
     def update_medicine(self, medicine_data):
         """
-        Actualiza los datos del medicamento existente.
+        Actualiza los datos de un medicamento existente en la base de datos.
 
         Args:
-            medicine_data (dict): Diccionario con los datos del medicamento a actualizar.
+            medicine_data (dict): Un diccionario con los datos actualizados del medicamento.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se actualizó correctamente el medicamento y, en caso de errores, los mensajes de error.
         """
-
         errors = validate_medicine(medicine_data)
         
         if len(errors.keys()) > 0:
@@ -378,10 +417,7 @@ class Product (models.Model):
 
     def __str__(self):
         """
-        Retorna una representación en cadena del producto.
-
-        Returns:
-            str: Nombre del producto.
+        Retorna una representación en string del producto, que es su nombre.
         """
         return self.name
     
@@ -391,11 +427,10 @@ class Product (models.Model):
         Guarda un nuevo producto en la base de datos.
 
         Args:
-            product_data (dict): Diccionario con los datos del producto.
+            product_data (dict): Un diccionario con los datos del producto.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se guardó correctamente el producto y, en caso de errores, los mensajes de error.
         """
         errors = validate_product(product_data)
 
@@ -412,14 +447,13 @@ class Product (models.Model):
     
     def update_product(self, product_data):
         """
-        Actualiza los datos del producto existente.
+        Actualiza los datos de un producto existente en la base de datos.
 
         Args:
-            product_data (dict): Diccionario con los datos del producto a actualizar.
+            product_data (dict): Un diccionario con los datos actualizados del producto.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se actualizó correctamente el producto y, en caso de errores, los mensajes de error.
         """
         errors = validate_product(product_data)
 
@@ -449,12 +483,8 @@ class Pet (models.Model):
 
     def __str__(self):
         """
-        Retorna una representación en cadena de la mascota.
-
-        Returns:
-            str: Nombre de la mascota.
+        Retorna una representación en string de la mascota, que es su nombre.
         """
-        
         return self.name
     
     @classmethod
@@ -463,13 +493,11 @@ class Pet (models.Model):
         Guarda una nueva mascota en la base de datos.
 
         Args:
-            pet_data (dict): Diccionario con los datos de la mascota.
+            pet_data (dict): Un diccionario con los datos de la mascota.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se guardó correctamente la mascota y, en caso de errores, los mensajes de error.
         """
-
         errors = validate_pet(pet_data)
 
         if len(errors.keys()) > 0:
@@ -485,16 +513,14 @@ class Pet (models.Model):
     
     def update_pet(self, pet_data):
         """
-        Actualiza los datos de la mascota existente.
+        Actualiza los datos de una mascota existente en la base de datos.
 
         Args:
-            pet_data (dict): Diccionario con los datos de la mascota a actualizar.
+            pet_data (dict): Un diccionario con los datos actualizados de la mascota.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se actualizó correctamente la mascota y, en caso de errores, los mensajes de error.
         """
-
         errors = validate_pet(pet_data)
 
         if len(errors.keys()) > 0:
@@ -523,12 +549,11 @@ class Speciality(Enum):
     @classmethod
     def choices(cls):
         """
-        Retorna una lista de opciones de especialidades.
-
+        Retorna una lista de tuplas con las opciones de especialidad.
+        
         Returns:
-            list: Lista de tuplas con las opciones de especialidades.
+            list: Una lista de tuplas con los nombres y valores de las especialidades.
         """
-
         return [(key.name, key.value) for key in cls]
 
 class Vet(models.Model):
@@ -549,12 +574,8 @@ class Vet(models.Model):
 
     def __str__(self):
         """
-        Retorna una representación en cadena del veterinario.
-
-        Returns:
-            str: Nombre del veterinario.
+        Retorna una representación en string del veterinario, que es su nombre.
         """
-          
         return self.name
 
     @classmethod
@@ -563,13 +584,11 @@ class Vet(models.Model):
         Guarda un nuevo veterinario en la base de datos.
 
         Args:
-            vet_data (dict): Diccionario con los datos del veterinario.
+            vet_data (dict): Un diccionario con los datos del veterinario.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se guardó correctamente el veterinario y, en caso de errores, los mensajes de error.
         """
-
         errors = validate_vet(vet_data)
 
         if len(errors.keys()) > 0:
@@ -586,16 +605,14 @@ class Vet(models.Model):
 
     def update_vet(self, vet_data):
         """
-        Actualiza los datos del veterinario existente.
+        Actualiza los datos de un veterinario existente en la base de datos.
 
         Args:
-            vet_data (dict): Diccionario con los datos del veterinario a actualizar.
+            vet_data (dict): Un diccionario con los datos actualizados del veterinario.
 
         Returns:
-            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
-                   y un diccionario de errores si los hay, o None si no hay errores.
+            tuple: Una tupla indicando si se actualizó correctamente el veterinario y, en caso de errores, los mensajes de error.
         """
-        
         errors = validate_vet(vet_data)
 
         if len(errors.keys()) > 0:
