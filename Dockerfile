@@ -1,14 +1,6 @@
 #Importamos una imagen de python para no tener que construir todo en base al SO
 FROM python:3.12-slim
 
-#ENV DB_ENGINE=
-#ENV DB_NAME=
-#ENV DEBUG=
-#ENV SECRET_KEY=
-#ENV ALLOWED_HOSTS=
-#ENV LANGUAGE_CODE=
-#ENV TIME_ZONE=
-
 #Elijo el directorio raíz de la aplicación como directorio de trabajo 
 WORKDIR .
 
