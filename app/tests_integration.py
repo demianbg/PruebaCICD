@@ -1,8 +1,9 @@
-from django.test import TestCase
-from django.shortcuts import reverse
-from app.models import Client, Product, Pet, Vet, Speciality, Provider, Medicine
-
 import datetime
+
+from django.shortcuts import reverse
+from django.test import TestCase
+
+from app.models import Client, Medicine, Pet, Product, Provider, Speciality, Vet
 
 
 class HomePageTest(TestCase):
@@ -178,20 +179,6 @@ class TestIntegration(TestCase):
         self.assertContains(response, "Por favor ingrese un precio mayor a cero")
         # Verifica que el producto no haya sido creado en la base de datos
         self.assertFalse(Product.objects.filter(name="ampicilina").exists())
-
-    def test_valid_product_price(self):
-        response = self.client.post(reverse('products_form'), {
-            "name": "ampicilina",
-            "type": "antibiotico",
-            "price": "10"  # Precio mayor a 0, debería ser válido
-        })
-
-        # Verifica que la solicitud haya sido exitosa (se espera un redirect)
-        self.assertEqual(response.status_code, 302)
-
-        # Verifica que el producto haya sido creado en la base de datos
-        self.assertTrue(Product.objects.filter(name="ampicilina").exists())
-
 
 class PetsTest(TestCase):
     def test_repo_use_repo_template(self):

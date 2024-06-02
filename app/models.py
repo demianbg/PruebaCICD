@@ -1,6 +1,8 @@
-from django.db import models
-from enum import Enum
 import datetime
+from enum import Enum
+
+from django.db import models
+
 
 def validate_client(data):
     errors = {}
@@ -49,7 +51,7 @@ def validate_medicine(data):
     name = data.get("name", "")
     description = data.get("description", "")
     dose = data.get("dose")
-    if not dose is None:
+    if dose is not None:
         try:
             num = int(dose)
         except ValueError:
