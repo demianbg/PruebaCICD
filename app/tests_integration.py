@@ -7,6 +7,10 @@ from app.models import Client, Medicine, Pet, Product, Provider, Speciality, Vet
 
 
 class HomePageTest(TestCase):
+    """
+    Pruebas para la vista de la página de inicio.
+    """
+
     def test_use_home_template(self):
         """
         Prueba si la plantilla utilizada para la página de inicio es la correcta.
@@ -16,6 +20,10 @@ class HomePageTest(TestCase):
 
 
 class ClientsTest(TestCase):
+    """
+    Pruebas para la vista y funcionalidad de los clientes.
+    """
+
     def test_repo_use_repo_template(self):
         """
         Prueba si la plantilla utilizada para el repositorio de clientes es la correcta.
@@ -129,6 +137,10 @@ class ClientsTest(TestCase):
 
 
 class TestIntegration(TestCase):
+    """
+    Pruebas de integración para la creación y validación de productos.
+    """
+     
     def test_some_integration(self):
         """
         Prueba la integración básica para verificar que se manejen errores de validación al crear un producto.
@@ -223,18 +235,25 @@ class TestIntegration(TestCase):
         self.assertFalse(Product.objects.filter(name="ampicilina").exists())
 
 class PetsTest(TestCase):
+    """
+    Pruebas para el manejo de mascotas en el sistema.
+    """
+
     def test_repo_use_repo_template(self):
         """Prueba que la plantilla utilizada para el repositorio de mascotas sea la correcta."""
         response = self.client.get(reverse("pets_repo"))
         self.assertTemplateUsed(response, "pets/repository.html")
+    
     def test_repo_display_all_pets(self):
         """Prueba que se muestren todas las mascotas en el repositorio."""
         response = self.client.get(reverse("pets_repo"))
         self.assertTemplateUsed(response, "pets/repository.html")
+
     def test_form_use_form_template(self):
         """Prueba que la plantilla utilizada para el formulario de mascotas sea la correcta."""
         response = self.client.get(reverse("pets_form"))
         self.assertTemplateUsed(response, "pets/form.html")
+    
     def test_can_create_pet(self):
         """Prueba que se puede crear una nueva mascota."""
         response = self.client.post(
@@ -247,19 +266,24 @@ class PetsTest(TestCase):
         )
         pets = Pet.objects.all()
         self.assertEqual(len(pets), 1)
+        
         self.assertEqual(pets[0].name, "gatito")
         self.assertEqual(pets[0].breed, "orange")
         self.assertEqual(pets[0].birthday, datetime.date(2024, 5, 18))
+        
         self.assertRedirects(response, reverse("pets_repo"))
+    
     def test_validation_errors_create_pet(self):
         """Prueba los errores de validación al crear una mascota con datos inválidos."""
         response = self.client.post(
             reverse("pets_form"),
             data={},
         )
+        
         self.assertContains(response, "Por favor ingrese un nombre")
         self.assertContains(response, "Por favor ingrese una raza")
         self.assertContains(response, "Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")
+    
     def test_should_response_with_404_status_if_pet_doesnt_exists(self):
         """Prueba que se responda con un estado 404 si la mascota no existe."""
         response = self.client.get(reverse("pets_edit", kwargs={"id": 100}))
@@ -275,6 +299,7 @@ class PetsTest(TestCase):
                 "email": date_now,
             },
         )
+        
         self.assertContains(response, "Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")
     def test_validation_invalid_birthday_date_later_than_today(self):
         """Prueba que la validación de la fecha de nacimiento no permita una fecha posterior a la actual.""" 
@@ -289,7 +314,9 @@ class PetsTest(TestCase):
                 "email": date,
             },
         )
+        
         self.assertContains(response, "Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")
+    
     def test_edit_user_with_valid_data_pet(self):
         """Prueba que se puede editar una mascota con datos válidos."""
         pet = Pet.objects.create(
@@ -297,6 +324,7 @@ class PetsTest(TestCase):
             breed="orange",
             birthday="2024-05-18"
         )
+        
         response = self.client.post(
             reverse("pets_form"),
             data={
@@ -306,12 +334,16 @@ class PetsTest(TestCase):
                 "birthday":pet.birthday,
             },
         )
+       
         # redirect after post
         self.assertEqual(response.status_code, 302)
+       
         editedPet = Pet.objects.get(pk=pet.id)
+       
         self.assertEqual(editedPet.name, "mishu")
         self.assertEqual(editedPet.breed, pet.breed)
         self.assertEqual(editedPet.birthday.strftime("%Y-%m-%d"), pet.birthday)
+   
     def test_edit_user_with_invalid_data_pet(self):
         """Prueba que no se puede editar una mascota con datos inválidos."""
         pet = Pet.objects.create(
@@ -319,6 +351,7 @@ class PetsTest(TestCase):
             breed="orange",
             birthday="2024-05-18"
         )
+        
         response = self.client.post(
             reverse("pets_form"),
             data={
@@ -328,9 +361,11 @@ class PetsTest(TestCase):
                 "birthday":"",
             },
         )
+        
         self.assertContains(response, "Por favor ingrese un nombre")
         self.assertContains(response, "Por favor ingrese una raza")
         self.assertContains(response, "Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")
+    
     def test_edit_user_with_invalid_birthday_today(self):
         """Prueba que no se pueda editar una mascota con la fecha de nacimiento igual a la actual."""
         pet = Pet.objects.create(
@@ -339,6 +374,7 @@ class PetsTest(TestCase):
             birthday="2024-05-18"
         )
         date_now = datetime.date.today().strftime("%Y-%m-%d")
+        
         response = self.client.post(
             reverse("pets_form"),
             data={
@@ -348,6 +384,7 @@ class PetsTest(TestCase):
                 "birthday":date_now,
             },
         )
+        
         self.assertContains(response, "Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")
     def test_edit_user_with_invalid_birthday_later_than_today(self):
         """Prueba que no se pueda editar una mascota con una fecha de nacimiento posterior a la actual.""" 
@@ -356,9 +393,11 @@ class PetsTest(TestCase):
             breed="orange",
             birthday="2024-05-18"
         )
+        
         date_now = datetime.date.today()
         date_later = date_now + datetime.timedelta(days=1)
         date = date_later.strftime("%Y-%m-%d")
+        
         response = self.client.post(
             reverse("pets_form"),
             data={
@@ -367,10 +406,15 @@ class PetsTest(TestCase):
                 "email": date,
             },
         )
+        
         self.assertContains(response, "Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")
 
 
 class VetsTest(TestCase):
+    """
+    Pruebas para la gestión de veterinarios en el sistema.
+    """
+
     def test_repo_use_repo_template(self):
         """Prueba que la plantilla utilizada para el repositorio de veterinarios sea la correcta."""
         response = self.client.get(reverse("vets_repo"))
@@ -511,6 +555,10 @@ class VetsTest(TestCase):
 
 
 class ProvidersTest(TestCase):
+    """
+    Pruebas para la gestión de proveedores en el sistema.
+    """
+
     def test_repo_use_repo_template(self):
         """Prueba que la vista del repositorio de proveedores usa la plantilla correcta."""
         response = self.client.get(reverse("providers_repo"))
@@ -638,6 +686,10 @@ class ProvidersTest(TestCase):
         self.assertContains(response, "Por favor ingrese una dirección")
 
 class MedicinesTest(TestCase):
+    """
+    Pruebas para la gestión de medicinas en el sistema.
+    """
+
     def test_repo_use_repo_template(self):
         """Prueba que el repositorio de medicamentos utiliza la plantilla correcta."""
         response = self.client.get(reverse("medicine_repo"))

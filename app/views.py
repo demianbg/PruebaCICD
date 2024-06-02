@@ -1,17 +1,32 @@
-from django.shortcuts import render, redirect, reverse, get_object_or_404
-from .models import Client, Provider, Medicine, Product, Pet, Vet
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 
 from .models import Client, Medicine, Pet, Product, Provider, Vet
 
 
 def home(request):
+    
+    """
+    Renderiza el template home.html que vendría a ser el menú principal (la pantalla de cards)
+    """
+    
     return render(request, "home.html")
 
 def clients_repository(request):
+    
+    """
+    Renderiza el template clients/repository.html. Este es el listado de clientes
+    """
+    
     clients = Client.objects.all()
     return render(request, "clients/repository.html", {"clients": clients})
 
 def clients_form(request, id=None):
+    
+    """
+    Renderiza el template clients/form.html, el cuál es el formulario de creación/edición de clientes.
+    Valida si existe el id entre los parámetros del cuerpo de la request, si existe renderiza el form con datos a editar. De lo contrario renderiza para crear uno nuevo
+    """
+    
     if request.method == "POST":
         client_id = request.POST.get("id", "")
         errors = {}
@@ -37,6 +52,11 @@ def clients_form(request, id=None):
     return render(request, "clients/form.html", {"client": client})
 
 def clients_delete(request):
+    
+    """
+    Permite recuperar un cliente y si existe lo elimina
+    """
+    
     client_id = request.POST.get("client_id")
     client = get_object_or_404(Client, pk=int(client_id))
     client.delete()
@@ -44,10 +64,21 @@ def clients_delete(request):
     return redirect(reverse("clients_repo"))
 
 def providers_repository(request):
+    
+    """
+    Renderiza el template providers/repository.html. Este es el listado de proveedores
+    """
+    
     providers = Provider.objects.all()
     return render(request, "providers/repository.html", {"providers": providers})
 
 def providers_form(request, id=None):
+    
+    """
+    Renderiza el template providers/form.html, el cuál es el formulario de creación/edición de proveedores.
+    Valida si existe el id entre los parámetros del cuerpo de la request, si existe renderiza el form con datos a editar. De lo contrario renderiza para crear uno nuevo
+    """
+    
     if request.method == "POST":
         provider_id = request.POST.get("id", "")
         errors = {}
@@ -73,6 +104,11 @@ def providers_form(request, id=None):
     return render(request, "providers/form.html", {"provider": provider})
 
 def providers_delete(request):
+    
+    """
+    Permite recuperar un proveedor y si existe lo elimina
+    """
+    
     provider_id = request.POST.get("provider_id")
     provider = get_object_or_404(Provider, pk=int(provider_id))
     provider.delete()
@@ -80,10 +116,22 @@ def providers_delete(request):
     return redirect(reverse("providers_repo"))
 
 def medicine_repository(request):
+    
+    """
+    Renderiza el template medicine/repository.html. Este es el listado de medicamentos
+    """
+    
     medicines = Medicine.objects.all()
     return render(request, "medicine/repository.html", {"medicines": medicines})
 
 def medicine_form(request, id=None):
+    
+    """
+    Renderiza el template medicine/form.html, el cuál es el formulario de creación/edición de medicamentos.
+    Valida si existe el id entre los parámetros del cuerpo de la request, si existe renderiza el form con datos a editar. De lo contrario renderiza para crear uno nuevo
+    """
+    
+
     if request.method == "POST":
         medicine_id = request.POST.get("id", "")
         errors = {}
@@ -110,6 +158,11 @@ def medicine_form(request, id=None):
     return render(request, "medicine/form.html", {"medicine": medicine})
 
 def medicine_delete(request):
+    
+    """
+    Permite recuperar un medicamento y si existe lo elimina
+    """
+    
     medicine_id = request.POST.get("medicine_id")
     medicine = get_object_or_404(Medicine, pk=int(medicine_id))
     medicine.delete()
@@ -117,10 +170,21 @@ def medicine_delete(request):
     return redirect(reverse("medicine_repo"))
 
 def products_repository(request):
+    
+    """
+    Renderiza el template products/repository.html. Este es el listado de productos
+    """
+    
     products = Product.objects.all()
     return render(request, "products/repository.html", {"products": products})
 
 def products_form(request, id=None):
+    
+    """
+    Renderiza el template products/form.html, el cuál es el formulario de creación/edición de productos.
+    Valida si existe el id entre los parámetros del cuerpo de la request, si existe renderiza el form con datos a editar. De lo contrario renderiza para crear uno nuevo
+    """
+    
     if request.method == "POST":
         product_id = request.POST.get("id", "")
         errors = {}
@@ -146,6 +210,11 @@ def products_form(request, id=None):
     return render(request, "products/form.html", {"product": product})
 
 def products_delete(request):
+    
+    """
+    Permite recuperar un producto y si existe lo elimina
+    """
+    
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, pk=int(product_id))
     product.delete()
@@ -153,10 +222,21 @@ def products_delete(request):
     return redirect(reverse("products_repo"))
 
 def pets_repository(request):
+    
+    """
+    Renderiza el template pets/repository.html. Este es el listado de mascotas
+    """
+    
     pets = Pet.objects.all()
     return render(request, "pets/repository.html", {"pets": pets})
 
 def pets_form(request, id=None):
+    
+    """
+    Renderiza el template pets/form.html, el cuál es el formulario de creación/edición de mascotas.
+    Valida si existe el id entre los parámetros del cuerpo de la request, si existe renderiza el form con datos a editar. De lo contrario renderiza para crear uno nuevo
+    """
+    
     if request.method == "POST":
         pet_id = request.POST.get("id", "")
         errors = {}
@@ -182,6 +262,11 @@ def pets_form(request, id=None):
     return render(request, "pets/form.html", {"pet": pet})
 
 def pets_delete(request):
+    
+    """
+    Permite recuperar una mascota y si existe lo elimina
+    """
+    
     pet_id = request.POST.get("pet_id")
     pet = get_object_or_404(Pet, pk=int(pet_id))
     pet.delete()
@@ -189,10 +274,21 @@ def pets_delete(request):
     return redirect(reverse("pets_repo"))
 
 def vets_repository(request):
+    
+    """
+    Renderiza el template vets/repository.html. Este es el listado de veterinarios
+    """
+    
     vets = Vet.objects.all()
     return render(request, "vets/repository.html", {"vets": vets})
 
 def vets_form(request, id=None):
+    
+    """
+    Renderiza el template vets/form.html, el cuál es el formulario de creación/edición de veterinarios.
+    Valida si existe el id entre los parámetros del cuerpo de la request, si existe renderiza el form con datos a editar. De lo contrario renderiza para crear uno nuevo
+    """
+    
     if request.method == "POST":
         vet_id = request.POST.get("id", "")
         errors = {}
@@ -218,6 +314,11 @@ def vets_form(request, id=None):
     return render(request, "vets/form.html", {"vet": vet})
 
 def vets_delete(request):
+    
+    """
+    Permite recuperar un veterinario y si existe lo elimina
+    """
+    
     vet_id = request.POST.get("vet_id")
     vet = get_object_or_404(Vet, pk=int(vet_id))
     vet.delete()
