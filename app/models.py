@@ -49,7 +49,7 @@ def validate_medicine(data):
     name = data.get("name", "")
     description = data.get("description", "")
     dose = data.get("dose")
-    if not dose is None:
+    if dose is not None:
         try:
             num = int(dose)
         except ValueError:
@@ -140,16 +140,43 @@ def validate_vet(data):
     return errors
 
 class Client(models.Model):
+    """
+    Modelo que representa un cliente.
+
+    Args:
+        name (str): Nombre del cliente.
+        phone (str): Número de teléfono del cliente.
+        email (EmailField): Dirección de correo electrónico del cliente.
+        address (str): Dirección del cliente. Puede estar en blanco.
+    """
+
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     email = models.EmailField()
     address = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
+        """
+        Retorna una representación en cadena del cliente.
+
+        Returns:
+            str: Nombre del cliente.
+        """
         return self.name
 
     @classmethod
     def save_client(cls, client_data):
+        """
+        Guarda un nuevo cliente en la base de datos.
+
+        Args:
+            client_data (dict): Diccionario con los datos del cliente.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+         
         errors = validate_client(client_data)
 
         if len(errors.keys()) > 0:
@@ -165,6 +192,17 @@ class Client(models.Model):
         return True, None
 
     def update_client(self, client_data):
+        """
+        Actualiza los datos del cliente existente.
+
+        Args:
+            client_data (dict): Diccionario con los datos del cliente a actualizar.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+
         errors = validate_client(client_data)
 
         if len(errors.keys()) > 0:
@@ -180,15 +218,40 @@ class Client(models.Model):
 
 
 class Provider (models.Model):
+    """
+    Modelo que representa un proveedor.
+
+    Args:
+        name (str): Nombre del proveedor.
+        email (EmailField): Dirección de correo electrónico del proveedor.
+        address (str): Dirección del proveedor.
+    """
+
     name = models.CharField(max_length=100)
     email = models.EmailField()
     address = models.CharField(max_length=200)
 
     def __str__(self):
-            return self.name
+        """
+        Retorna una representación en cadena del proveedor.
+
+        Returns:
+            str: Nombre del proveedor.
+        """
+        return self.name
     
     @classmethod
     def save_provider(cls, provider_data):
+        """
+        Guarda un nuevo proveedor en la base de datos.
+
+        Args:
+            provider_data (dict): Diccionario con los datos del proveedor.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
         errors = validate_provider(provider_data)
 
         if len(errors.keys()) > 0:
@@ -203,6 +266,17 @@ class Provider (models.Model):
         return True, None
 
     def update_provider(self, provider_data):
+        """
+        Actualiza los datos del proveedor existente.
+
+        Args:
+            provider_data (dict): Diccionario con los datos del proveedor a actualizar.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+
         errors = validate_provider(provider_data)
 
         if len(errors.keys()) > 0:
@@ -216,15 +290,42 @@ class Provider (models.Model):
         return True, None
 
 class Medicine(models.Model):
+    """
+    Modelo que representa un medicamento.
+
+    Args:
+        name (str): Nombre del medicamento.
+        description (str): Descripción del medicamento.
+        dose (int): Dosis del medicamento.
+    """
+
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     dose = models.IntegerField()
 
     def __str__(self):
+        """
+        Retorna una representación en cadena del medicamento.
+
+        Returns:
+            str: Nombre del medicamento.
+        """
+
         return self.name
 
     @classmethod
     def save_medicine(cls, medicine_data):
+        """
+        Guarda un nuevo medicamento en la base de datos.
+
+        Args:
+            medicine_data (dict): Diccionario con los datos del medicamento.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+
         errors = validate_medicine(medicine_data)
 
         if len(errors.keys()) > 0:
@@ -238,6 +339,17 @@ class Medicine(models.Model):
         return True, None
 
     def update_medicine(self, medicine_data):
+        """
+        Actualiza los datos del medicamento existente.
+
+        Args:
+            medicine_data (dict): Diccionario con los datos del medicamento a actualizar.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+
         errors = validate_medicine(medicine_data)
         
         if len(errors.keys()) > 0:
@@ -251,15 +363,40 @@ class Medicine(models.Model):
         return True, None
 
 class Product (models.Model):
+    """
+    Modelo que representa una mascota.
+
+    Args:
+        name(str): Nombre del producto.
+        type(str): Tipo del producto.
+        price(float): Precio del producto.
+    """
+
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
     price = models.FloatField()
 
     def __str__(self):
+        """
+        Retorna una representación en cadena del producto.
+
+        Returns:
+            str: Nombre del producto.
+        """
         return self.name
     
     @classmethod
     def save_product(cls, product_data):
+        """
+        Guarda un nuevo producto en la base de datos.
+
+        Args:
+            product_data (dict): Diccionario con los datos del producto.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
         errors = validate_product(product_data)
 
         if len(errors.keys()) > 0:
@@ -274,6 +411,16 @@ class Product (models.Model):
         return True, None
     
     def update_product(self, product_data):
+        """
+        Actualiza los datos del producto existente.
+
+        Args:
+            product_data (dict): Diccionario con los datos del producto a actualizar.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
         errors = validate_product(product_data)
 
         if len(errors.keys()) > 0:
@@ -287,15 +434,42 @@ class Product (models.Model):
         return True, None
         
 class Pet (models.Model):
+    """
+    Modelo que representa una mascota.
+
+    Args:
+        name (str): Nombre de la mascota.
+        breed (str): Raza de la mascota.
+        birthday (date): Fecha de nacimiento de la mascota.
+    """
+
     name = models.CharField(max_length=100)
     breed = models.CharField(max_length=100)
     birthday = models.DateField()
 
     def __str__(self):
+        """
+        Retorna una representación en cadena de la mascota.
+
+        Returns:
+            str: Nombre de la mascota.
+        """
+        
         return self.name
     
     @classmethod
     def save_pet(cls, pet_data):
+        """
+        Guarda una nueva mascota en la base de datos.
+
+        Args:
+            pet_data (dict): Diccionario con los datos de la mascota.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+
         errors = validate_pet(pet_data)
 
         if len(errors.keys()) > 0:
@@ -310,6 +484,17 @@ class Pet (models.Model):
         return True, None
     
     def update_pet(self, pet_data):
+        """
+        Actualiza los datos de la mascota existente.
+
+        Args:
+            pet_data (dict): Diccionario con los datos de la mascota a actualizar.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+
         errors = validate_pet(pet_data)
 
         if len(errors.keys()) > 0:
@@ -323,6 +508,10 @@ class Pet (models.Model):
         return True, None
 
 class Speciality(Enum):
+    """
+    Enumeración que representa las especialidades veterinarias.
+    """
+
     Oftalmologia = "Oftalmologia"
     Quimioterapia = "Quimioterapia"
     Radiologia = "Radiologia"
@@ -333,19 +522,54 @@ class Speciality(Enum):
     
     @classmethod
     def choices(cls):
+        """
+        Retorna una lista de opciones de especialidades.
+
+        Returns:
+            list: Lista de tuplas con las opciones de especialidades.
+        """
+
         return [(key.name, key.value) for key in cls]
 
 class Vet(models.Model):
+    """
+    Modelo que representa a un veterinario.
+
+    Atributos:
+        name (str): Nombre del veterinario.
+        email (EmailField): Dirección de correo electrónico del veterinario.
+        phone (str): Número de teléfono del veterinario.
+        speciality (str): Especialidad del veterinario.
+    """
+
     name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=15)
     speciality = models.CharField(max_length=100, choices=Speciality.choices(), default=Speciality.Urgencias)
 
     def __str__(self):
+        """
+        Retorna una representación en cadena del veterinario.
+
+        Returns:
+            str: Nombre del veterinario.
+        """
+          
         return self.name
 
     @classmethod
     def save_vet(cls, vet_data):
+        """
+        Guarda un nuevo veterinario en la base de datos.
+
+        Args:
+            vet_data (dict): Diccionario con los datos del veterinario.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+
         errors = validate_vet(vet_data)
 
         if len(errors.keys()) > 0:
@@ -361,6 +585,17 @@ class Vet(models.Model):
         return True, None
 
     def update_vet(self, vet_data):
+        """
+        Actualiza los datos del veterinario existente.
+
+        Args:
+            vet_data (dict): Diccionario con los datos del veterinario a actualizar.
+
+        Returns:
+            tuple: Una tupla que contiene un booleano indicando el éxito de la operación 
+                   y un diccionario de errores si los hay, o None si no hay errores.
+        """
+        
         errors = validate_vet(vet_data)
 
         if len(errors.keys()) > 0:
