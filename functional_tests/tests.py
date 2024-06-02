@@ -16,6 +16,10 @@ slow_mo = os.environ.get("SLOW_MO", 0)
 
 
 class PlaywrightTestCase(StaticLiveServerTestCase):
+    """
+    Clase base para pruebas de integración utilizando Playwright y StaticLiveServerTestCase de Django.
+    """
+
     @classmethod
     def setUpClass(cls):
         """
@@ -62,6 +66,10 @@ class PlaywrightTestCase(StaticLiveServerTestCase):
 
 
 class HomeTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la página de inicio del sistema.
+    """
+
     def test_should_have_navbar_with_links(self):
         """Verifica si la barra de navegación contiene enlaces válidos."""
         self.page.goto(self.live_server_url)
@@ -90,6 +98,10 @@ class HomeTestCase(PlaywrightTestCase):
 
 
 class ClientsRepoTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la vista del repositorio de clientes.
+    """
+
     def test_should_show_message_if_table_is_empty(self):
         """Verifica si se muestra un mensaje cuando la tabla está vacía."""
         self.page.goto(f"{self.live_server_url}{reverse('clients_repo')}")
@@ -189,7 +201,6 @@ class ClientsRepoTestCase(PlaywrightTestCase):
         def is_delete_response(response):
             return response.url.find(reverse("clients_delete"))
 
-        # verificamos que el envio del formulario fue exitoso
         with self.page.expect_response(is_delete_response) as response_info:
             self.page.get_by_role("button", name="Eliminar").click()
 
@@ -200,6 +211,10 @@ class ClientsRepoTestCase(PlaywrightTestCase):
 
 
 class ClientCreateEditTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la creación y edición de clientes.
+    """
+
     def test_should_be_able_to_create_a_new_client(self):
         """Verifica si se puede crear un nuevo cliente."""
         self.page.goto(f"{self.live_server_url}{reverse('clients_form')}")
@@ -282,6 +297,10 @@ class ClientCreateEditTestCase(PlaywrightTestCase):
 
 
 class ProductCreateEditTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la creación y edición de productos.
+    """
+
     def test_should_be_able_to_create_a_new_product(self):
         """Verifica si se puede crear un nuevo producto."""
         self.page.goto(f"{self.live_server_url}{reverse('products_form')}")
@@ -327,14 +346,13 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
 
         expect(self.page.get_by_role("form")).to_be_visible()
         self.page.get_by_role("button", name="Guardar").click()
-        # Intentar crear un producto con precio negativo
+        
         self.page.get_by_label("Nombre").fill("ampicilina")
         self.page.get_by_label("Tipo").fill("antibiotico")
         self.page.get_by_label("Precio").fill("-10")
 
         self.page.get_by_role("button", name="Guardar").click()
 
-        # Verificar los mensajes de error después de enviar el formulario
         expect(self.page.get_by_text("Por favor ingrese un nombre")).not_to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese un tipo")).not_to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese un precio")).to_be_visible()
@@ -367,26 +385,20 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
             price=10
         )
 
-    # Navegar al formulario de edición del producto
         path = reverse("products_edit", kwargs={"id": product.id})
         self.page.goto(f"{self.live_server_url}{path}")
 
-    # Intentar editar el producto con un precio vacío
         self.page.get_by_label("Nombre").fill("Producto Editado")
         self.page.get_by_label("Tipo").fill("Tipo Editado")
         self.page.get_by_label("Precio").fill("")
 
-    # Intentar guardar los cambios
         self.page.get_by_role("button", name="Guardar").click()
 
-    # Verificar que aparezca el mensaje de error correspondiente
         expect(self.page.get_by_text("Por favor ingrese un precio")).to_be_visible()
 
-    # Intentar editar el producto con un precio de cero
         self.page.get_by_label("Precio").fill("0")
         self.page.get_by_role("button", name="Guardar").click()
 
-    # Verificar que aparezca el mensaje de error correspondiente
         expect(self.page.get_by_text("Por favor ingrese un precio mayor a cero")).to_be_visible()
 
     def test_should_not_allow_editing_product_with_negative_price(self):
@@ -403,30 +415,30 @@ class ProductCreateEditTestCase(PlaywrightTestCase):
             price=10
         )
 
-        # Navegar al formulario de edición del producto
         path = reverse("products_edit", kwargs={"id": product.id})
         self.page.goto(f"{self.live_server_url}{path}")
 
-    # Intentar editar el producto con un precio negativo
         self.page.get_by_label("Nombre").fill("Producto Editado")
         self.page.get_by_label("Tipo").fill("Tipo Editado")
         self.page.get_by_label("Precio").fill("-10")
 
-    # Intentar guardar los cambios
         self.page.get_by_role("button", name="Guardar").click()
 
-    # Verificar que aparezca el mensaje de error correspondiente
         expect(self.page.get_by_text("Por favor ingrese un precio mayor a cero")).to_be_visible()
 
 
-
 class PetsRepoTestCase(PlaywrightTestCase):
+    """
+    Pruebas para el repositorio de mascotas.
+    """
+
     def test_should_show_message_if_table_is_empty(self):
         """
         Verifica que se muestre un mensaje si la tabla de mascotas está vacía.
         """
         self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
         expect(self.page.get_by_text("No existen mascotas")).to_be_visible()
+   
     def test_should_show_pets_data(self):
         """
         Verifica que se muestren los datos de las mascotas.
@@ -441,7 +453,9 @@ class PetsRepoTestCase(PlaywrightTestCase):
             breed="mestizo",
             birthday="2024-04-10",
         )
+        
         self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
+        
         expect(self.page.get_by_text("No existen mascotas")).not_to_be_visible()
         expect(self.page.get_by_text("gatito")).to_be_visible()
         expect(self.page.get_by_text("orange")).to_be_visible()
@@ -449,6 +463,7 @@ class PetsRepoTestCase(PlaywrightTestCase):
         expect(self.page.get_by_text("mishu")).to_be_visible()
         expect(self.page.get_by_text("mestizo")).to_be_visible()
         expect(self.page.get_by_text("April 10, 2024")).to_be_visible()
+    
     def test_should_show_add_pet_action(self):
         """
         Verifica que se muestre la acción para agregar una nueva mascota.
@@ -457,7 +472,9 @@ class PetsRepoTestCase(PlaywrightTestCase):
         add_client_action = self.page.get_by_role(
             "link", name="Nueva Mascota", exact=False
         )
+        
         expect(add_client_action).to_have_attribute("href", reverse("pets_form"))
+    
     def test_should_show_pet_edit_action(self):
         """
         Verifica que se muestre la acción para editar una mascota.
@@ -467,11 +484,14 @@ class PetsRepoTestCase(PlaywrightTestCase):
             breed="orange",
             birthday="2024-05-18",
         )
+        
         self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
+        
         edit_action = self.page.get_by_role("link", name="Editar")
         expect(edit_action).to_have_attribute(
             "href", reverse("pets_edit", kwargs={"id": pet.id})
         )
+    
     def test_should_show_pet_delete_action(self):
         """
         Verifica que se muestre la acción para eliminar una mascota.
@@ -481,16 +501,21 @@ class PetsRepoTestCase(PlaywrightTestCase):
             breed="orange",
             birthday="2024-05-18",
         )
+        
         self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
+        
         edit_form = self.page.get_by_role(
             "form", name="Formulario de eliminación de mascotas" 
+        
         )
         pet_id_input = edit_form.locator("input[name=pet_id]")
+        
         expect(edit_form).to_be_visible()
         expect(edit_form).to_have_attribute("action", reverse("pets_delete"))
         expect(pet_id_input).not_to_be_visible()
         expect(pet_id_input).to_have_value(str(pet.id))
         expect(edit_form.get_by_role("button", name="Eliminar")).to_be_visible()
+    
     def test_should_be_able_to_delete_a_pet(self):
         """
         Verifica que se pueda eliminar una mascota.
@@ -500,63 +525,90 @@ class PetsRepoTestCase(PlaywrightTestCase):
             breed="orange",
             birthday="2024-05-18",
         )
+        
         self.page.goto(f"{self.live_server_url}{reverse('pets_repo')}")
+        
         expect(self.page.get_by_text("gatito")).to_be_visible()
+        
         def is_delete_response(response):
             return response.url.find(reverse("pets_delete"))
-        # verificamos que el envio del formulario fue exitoso
+        
         with self.page.expect_response(is_delete_response) as response_info:
             self.page.get_by_role("button", name="Eliminar").click()
+        
         response = response_info.value
         self.assertTrue(response.status < 400) #si es menor es exitoso
+        
         expect(self.page.get_by_text("gatito")).not_to_be_visible()
+
+
 class PetCreateEditTestCase(PlaywrightTestCase):
+    """
+    Pruebas para crear y editar mascotas.
+    """
+
     def test_should_be_able_to_create_a_new_pet(self):
         """
         Verifica que se pueda crear una nueva mascota correctamente.
         """
         self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
+        
         expect(self.page.get_by_role("form")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill("2024-05-18")
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("gatito")).to_be_visible()
         expect(self.page.get_by_text("orange")).to_be_visible()
         expect(self.page.get_by_text("May 18, 2024")).to_be_visible()
+    
     def test_should_view_errors_if_form_is_invalid(self):
         """
         Verifica que se muestren los errores si el formulario es inválido.
         """
         self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
+        
         expect(self.page.get_by_role("form")).to_be_visible()
+        
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese un nombre")).to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese una raza")).to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill("2024-05-18")
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese un nombre")).not_to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese una raza")).not_to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).not_to_be_visible()
+    
     def test_should_view_error_if_birthday_is_today(self):
         """
         Verifica que se muestre un error si la fecha de nacimiento es la fecha actual.
         """
         date_now = datetime.date.today().strftime("%Y-%m-%d")
+        
         self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
+        
         expect(self.page.get_by_role("form")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill(date_now)
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill("2024-05-18")
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).not_to_be_visible()
     def test_should_view_error_if_birthday_is_later_than_today(self):
         """
@@ -565,18 +617,25 @@ class PetCreateEditTestCase(PlaywrightTestCase):
         date_now = datetime.date.today()
         date_later = date_now + datetime.timedelta(days=1)
         date = date_later.strftime("%Y-%m-%d")
+        
         self.page.goto(f"{self.live_server_url}{reverse('pets_form')}")
+        
         expect(self.page.get_by_role("form")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill(date)
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill("2024-05-18")
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).not_to_be_visible()
+    
     def test_should_be_able_to_edit_a_pet(self):
         """
         Verifica que se pueda editar una mascota correctamente.
@@ -586,22 +645,28 @@ class PetCreateEditTestCase(PlaywrightTestCase):
             breed="orange",
             birthday="2024-05-18",
         )
+        
         path = reverse("pets_edit", kwargs={"id": pet.id})
+        
         self.page.goto(f"{self.live_server_url}{path}")
         self.page.get_by_label("Nombre").fill("mishu")
         self.page.get_by_label("Raza").fill("mestizo")
         self.page.get_by_label("Fecha de Nacimiento").fill("2024-04-10")
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("gatito")).not_to_be_visible()
         expect(self.page.get_by_text("orange")).not_to_be_visible()
         expect(self.page.get_by_text("May 18, 2024")).not_to_be_visible()
         expect(self.page.get_by_text("mishu")).to_be_visible()
         expect(self.page.get_by_text("mestizo")).to_be_visible()
         expect(self.page.get_by_text("April 10, 2024")).to_be_visible()
+        
         edit_action = self.page.get_by_role("link", name="Editar")
+        
         expect(edit_action).to_have_attribute(
             "href", reverse("pets_edit", kwargs={"id": pet.id})
         )
+    
     def test_should_not_be_able_to_edit_pet_if_form_is_invalid(self):
         """
         Verifica que no se pueda editar una mascota si el formulario es inválido.
@@ -611,32 +676,41 @@ class PetCreateEditTestCase(PlaywrightTestCase):
             breed="orange",
             birthday="2024-05-18",
         )
+        
         path = reverse("pets_edit", kwargs={"id": pet.id})
+        
         self.page.goto(f"{self.live_server_url}{path}")
         self.page.get_by_label("Nombre").fill("")
         self.page.get_by_label("Raza").fill("")
         self.page.get_by_label("Fecha de Nacimiento").fill("")
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese un nombre")).to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese una raza")).to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("mishu")
         self.page.get_by_label("Raza").fill("mestizo")
         self.page.get_by_label("Fecha de Nacimiento").fill("2024-04-10")
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese un nombre")).not_to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese una raza")).not_to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).not_to_be_visible()
+        
         expect(self.page.get_by_text("gatito")).not_to_be_visible()
         expect(self.page.get_by_text("orange")).not_to_be_visible()
         expect(self.page.get_by_text("May 18, 2024")).not_to_be_visible()
+        
         expect(self.page.get_by_text("mishu")).to_be_visible()
         expect(self.page.get_by_text("mestizo")).to_be_visible()
         expect(self.page.get_by_text("April 10, 2024")).to_be_visible()
+        
         edit_action = self.page.get_by_role("link", name="Editar")
         expect(edit_action).to_have_attribute(
             "href", reverse("pets_edit", kwargs={"id": pet.id})
         )
+    
     def test_should_not_be_able_to_edit_pet_if_birthday_is_today(self):
         """
         Verifica que no se pueda editar una mascota si la fecha de nacimiento es hoy.
@@ -646,27 +720,38 @@ class PetCreateEditTestCase(PlaywrightTestCase):
             breed="orange",
             birthday="2024-05-18",
         )
+        
         path = reverse("pets_edit", kwargs={"id": pet.id})
+        
         self.page.goto(f"{self.live_server_url}{path}")
+        
         date_now = datetime.date.today().strftime("%Y-%m-%d")
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill(date_now)
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill("2024-04-10")
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).not_to_be_visible()
         expect(self.page.get_by_text("gatito")).to_be_visible()
         expect(self.page.get_by_text("orange")).to_be_visible()
         expect(self.page.get_by_text("April 10, 2024")).to_be_visible()
+        
         expect(self.page.get_by_text("May 18, 2024")).not_to_be_visible()
+        
         edit_action = self.page.get_by_role("link", name="Editar")
+        
         expect(edit_action).to_have_attribute(
             "href", reverse("pets_edit", kwargs={"id": pet.id})
         )
+    
     def test_should_not_be_able_to_edit_pet_if_birthday_is_later_than_today(self):
         """
         Verifica que no se pueda editar una mascota si la fecha de nacimiento es posterior a hoy.
@@ -676,36 +761,55 @@ class PetCreateEditTestCase(PlaywrightTestCase):
             breed="orange",
             birthday="2024-05-18",
         )
+        
         path = reverse("pets_edit", kwargs={"id": pet.id})
+        
         self.page.goto(f"{self.live_server_url}{path}")
+        
         date_now = datetime.date.today()
         date_later = date_now + datetime.timedelta(days=1)
         date = date_later.strftime("%Y-%m-%d")
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill(date)
+        
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("gatito")
         self.page.get_by_label("Raza").fill("orange")
         self.page.get_by_label("Fecha de Nacimiento").fill("2024-04-10")
+        
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese una fecha de nacimiento valida y anterior a la de hoy")).not_to_be_visible()
         expect(self.page.get_by_text("gatito")).to_be_visible()
         expect(self.page.get_by_text("orange")).to_be_visible()
         expect(self.page.get_by_text("April 10, 2024")).to_be_visible()
+        
         expect(self.page.get_by_text("May 18, 2024")).not_to_be_visible()
+        
         edit_action = self.page.get_by_role("link", name="Editar")
+        
         expect(edit_action).to_have_attribute(
             "href", reverse("pets_edit", kwargs={"id": pet.id})
         )
+
+
 class VetsRepoTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la vista del repositorio de veterinarios.
+    """
+
     def test_should_show_message_if_table_is_empty(self):
         """
         Verifica que se muestre un mensaje si la tabla está vacía.
         """
         self.page.goto(f"{self.live_server_url}{reverse('vets_repo')}")
         expect(self.page.get_by_text("No existen veterinarios")).to_be_visible()
+    
     def test_should_show_vets_data(self):
         """
         Verifica que se muestren los datos de los veterinarios correctamente.
@@ -716,31 +820,39 @@ class VetsRepoTestCase(PlaywrightTestCase):
             phone="221555232",
             speciality="Urgencias",
         )
+        
         Vet.objects.create(
             name="Guido Carrillo",
             email="goleador@gmail.com",
             phone="221232555",
             speciality="Oftalmologia"
         )
+        
         self.page.goto(f"{self.live_server_url}{reverse('vets_repo')}")
+        
         expect(self.page.get_by_text("No existen veterinarios")).not_to_be_visible()
         expect(self.page.get_by_text("Juan Sebastián Veron")).to_be_visible()
         expect(self.page.get_by_text("brujita75@hotmail.com")).to_be_visible()
         expect(self.page.get_by_text("221555232")).to_be_visible()
         expect(self.page.get_by_text("Urgencias")).to_be_visible()
+        
         expect(self.page.get_by_text("Guido Carrillo")).to_be_visible()
         expect(self.page.get_by_text("goleador@gmail.com")).to_be_visible()
         expect(self.page.get_by_text("221232555")).to_be_visible()
         expect(self.page.get_by_text("Oftalmologia")).to_be_visible()
+    
     def test_should_show_add_vet_action(self):
         """
         Verifica que se muestre la acción para agregar un veterinario.
         """
         self.page.goto(f"{self.live_server_url}{reverse('vets_repo')}")
+        
         add_vet_action = self.page.get_by_role(
             "link", name="Nuevo Veterinario", exact=False
         )
+        
         expect(add_vet_action).to_have_attribute("href", reverse("vets_form"))
+    
     def test_should_show_vet_edit_action(self):
         """
         Verifica que se muestre la acción para editar un veterinario.
@@ -751,11 +863,15 @@ class VetsRepoTestCase(PlaywrightTestCase):
             phone="221555232",
             speciality="Urgencias",
         )
+        
         self.page.goto(f"{self.live_server_url}{reverse('vets_repo')}")
+        
         edit_action = self.page.get_by_role("link", name="Editar")
+        
         expect(edit_action).to_have_attribute(
             "href", reverse("vets_edit", kwargs={"id": vet.id})
         )
+    
     def test_should_show_vet_delete_action(self):
         """
         Verifica que se muestre la acción para eliminar un veterinario.
@@ -766,16 +882,24 @@ class VetsRepoTestCase(PlaywrightTestCase):
             phone="221555232",
             speciality="Urgencias",
         )
+        
         self.page.goto(f"{self.live_server_url}{reverse('vets_repo')}")
+        
         edit_form = self.page.get_by_role(
             "form", name="Formulario de eliminación de veterinario"
         )
+        
         vet_id_input = edit_form.locator("input[name=vet_id]")
+        
         expect(edit_form).to_be_visible()
+        
         expect(edit_form).to_have_attribute("action", reverse("vets_delete"))
+        
         expect(vet_id_input).not_to_be_visible()
         expect(vet_id_input).to_have_value(str(vet.id))
+        
         expect(edit_form.get_by_role("button", name="Eliminar")).to_be_visible()
+    
     def test_should_can_be_able_to_delete_a_vet(self):
         """
         Verifica que se pueda eliminar un veterinario.
@@ -786,51 +910,75 @@ class VetsRepoTestCase(PlaywrightTestCase):
             phone="221555232",
             speciality="Urgencias",
         )
+        
         self.page.goto(f"{self.live_server_url}{reverse('vets_repo')}")
+        
         expect(self.page.get_by_text("Juan Sebastián Veron")).to_be_visible()
+        
         def is_delete_response(response):
             return response.url.find(reverse("vets_delete"))
+        
         with self.page.expect_response(is_delete_response) as response_info:
             self.page.get_by_role("button", name="Eliminar").click()
+        
         response = response_info.value
+        
         self.assertTrue(response.status < 400)
+        
         expect(self.page.get_by_text("Juan Sebastián Veron")).not_to_be_visible()
+
+
 class VetCreateEditTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la creación y edición de veterinarios.
+    """
+
     def test_should_be_able_to_create_a_new_vet(self):
         """
         Verifica que se pueda crear un nuevo veterinario.
         """
         self.page.goto(f"{self.live_server_url}{reverse('vets_form')}")
+        
         expect(self.page.get_by_role("form")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
         self.page.get_by_label("Email").fill("brujita75@hotmail.com")
         self.page.get_by_label("Teléfono").fill("221555232")
         self.page.select_option("select[name=speciality]", value="Urgencias")
+        
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Juan Sebastián Veron")).to_be_visible()
         expect(self.page.get_by_text("brujita75@hotmail.com")).to_be_visible()
         expect(self.page.get_by_text("221555232")).to_be_visible()
         expect(self.page.get_by_text("Urgencias")).to_be_visible()
+    
     def test_should_view_errors_if_form_is_invalid(self):
         """
         Verifica que se muestren errores si el formulario de creación de veterinario es inválido.
         """
         self.page.goto(f"{self.live_server_url}{reverse('vets_form')}")
+        
         expect(self.page.get_by_role("form")).to_be_visible()
+        
         self.page.get_by_role("button", name="Guardar").click()
         expect(self.page.get_by_text("Por favor ingrese un nombre")).to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese un email")).to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese un teléfono")).to_be_visible()
         expect(self.page.get_by_text("Por favor seleccione una especialidad")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
         self.page.get_by_label("Email").fill("brujita75")
         self.page.get_by_label("Teléfono").fill("221555232")
         self.page.select_option("select[name=speciality]", value="Urgencias")
+        
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Por favor ingrese un nombre")).not_to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese un email valido")).to_be_visible()
         expect(self.page.get_by_text("Por favor ingrese un teléfono")).not_to_be_visible()
         expect(self.page.get_by_text("Por favor seleccione una especialidad")).not_to_be_visible()
+    
     def test_should_be_able_to_edit_a_vet(self):
         """
         Verifica que se pueda editar un veterinario existente.
@@ -841,38 +989,51 @@ class VetCreateEditTestCase(PlaywrightTestCase):
             phone="221555232",
             speciality="Urgencias",
         )
+        
         path = reverse("vets_edit", kwargs={"id": vet.id})
+        
         self.page.goto(f"{self.live_server_url}{path}")
+        
         self.page.get_by_label("Nombre").fill("Guido Carrillo")
         self.page.get_by_label("Email").fill("goleador@gmail.com")
         self.page.get_by_label("Teléfono").fill("221232555")
         self.page.select_option("select[name=speciality]", value="Oftalmologia")
+        
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Juan Sebastián Veron")).not_to_be_visible()
         expect(self.page.get_by_text("brujita75@hotmail.com")).not_to_be_visible()
         expect(self.page.get_by_text("221555232")).not_to_be_visible()
         expect(self.page.get_by_text("Urgencias")).not_to_be_visible()
+        
         expect(self.page.get_by_text("Guido Carrillo")).to_be_visible()
         expect(self.page.get_by_text("goleador@gmail.com")).to_be_visible()
         expect(self.page.get_by_text("221232555")).to_be_visible()
         expect(self.page.get_by_text("Oftalmologia")).to_be_visible()
+        
         edit_action = self.page.get_by_role("link", name="Editar")
+        
         expect(edit_action).to_have_attribute(
             "href", reverse("vets_edit", kwargs={"id": vet.id})
         )
+    
     def test_should_be_able_to_create_a_new_vet_with_valid_speciality(self):
         """
         Verifica que se pueda crear un nuevo veterinario con una especialidad válida.
         """
         self.page.goto(f"{self.live_server_url}{reverse('vets_form')}")
+        
         expect(self.page.get_by_role("form")).to_be_visible()
+        
         self.page.get_by_label("Nombre").fill("Juan Sebastián Veron")
         self.page.get_by_label("Email").fill("brujita75@hotmail.com")
         self.page.get_by_label("Teléfono").fill("221555232")
         
         valid_specialities = [speciality.value for speciality in Speciality]
         self.page.select_option("select[name=speciality]", value=valid_specialities[0])
+        
         self.page.get_by_role("button", name="Guardar").click()
+        
         expect(self.page.get_by_text("Juan Sebastián Veron")).to_be_visible()
         expect(self.page.get_by_text("brujita75@hotmail.com")).to_be_visible()
         expect(self.page.get_by_text("221555232")).to_be_visible()
@@ -880,6 +1041,10 @@ class VetCreateEditTestCase(PlaywrightTestCase):
 
 
 class ProvidersRepoTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la vista del repositorio de proveedores.
+    """
+     
     def test_should_show_message_if_table_is_empty(self):
         """
         Verifica que se muestre un mensaje si la tabla de proveedores está vacía.
@@ -988,7 +1153,6 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
             """
             return response.url.find(reverse("providers_delete"))
 
-        # Verificamos que el envio del formulario fue exitoso
         with self.page.expect_response(is_delete_response) as response_info:
             self.page.get_by_role("button", name="Eliminar").click()
 
@@ -997,7 +1161,12 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
 
         expect(self.page.get_by_text("Bogado")).not_to_be_visible()
 
+
 class ProviderCreateEditTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la creación y edición de proveedores.
+    """
+
     def test_should_be_able_to_create_a_new_provider(self):
         """
         Verifica que un proveedor se pueda crear correctamente llenando el formulario con información válida.
@@ -1229,7 +1398,12 @@ class ProviderCreateEditTestCase(PlaywrightTestCase):
             "href", reverse("providers_edit", kwargs={"id":provider.id})
         )
         
+
 class MedicineCreateEditTestCase(PlaywrightTestCase):
+    """
+    Pruebas para la creación y edición de medicinas.
+    """
+
     def test_should_be_able_to_create_a_new_medicine(self):
         """
         Verifies the ability to create a new medicine.

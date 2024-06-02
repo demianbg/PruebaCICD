@@ -195,14 +195,15 @@ def validate_vet(data):
 
 class Client(models.Model):
     """
-    Modelo para un cliente.
+    Modelo que representa un cliente.
 
-    Atributos:
-        name (CharField): Nombre del cliente.
-        phone (CharField): Teléfono del cliente.
-        email (EmailField): Correo electrónico del cliente.
-        address (CharField): Dirección del cliente.
+    Args:
+        name (str): Nombre del cliente.
+        phone (str): Número de teléfono del cliente.
+        email (EmailField): Dirección de correo electrónico del cliente.
+        address (str): Dirección del cliente. Puede estar en blanco.
     """
+
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     email = models.EmailField()
@@ -211,6 +212,9 @@ class Client(models.Model):
     def __str__(self):
         """
         Retorna una representación en string del cliente, que es su nombre.
+
+        Returns:
+            str: Nombre del cliente.
         """
         return self.name
 
@@ -265,13 +269,14 @@ class Client(models.Model):
 
 class Provider (models.Model):
     """
-    Modelo para un proveedor.
+    Modelo que representa un proveedor.
 
-    Atributos:
-        name (CharField): Nombre del proveedor.
-        email (EmailField): Correo electrónico del proveedor.
-        address (CharField): Dirección del proveedor.
+    Args:
+        name (str): Nombre del proveedor.
+        email (EmailField): Dirección de correo electrónico del proveedor.
+        address (str): Dirección del proveedor.
     """
+
     name = models.CharField(max_length=100)
     email = models.EmailField()
     address = models.CharField(max_length=200)
@@ -279,6 +284,9 @@ class Provider (models.Model):
     def __str__(self):
         """
         Retorna una representación en string del proveedor, que es su nombre.
+
+        Returns:
+            str: Nombre del proveedor.
         """
         return self.name
     
@@ -329,6 +337,15 @@ class Provider (models.Model):
         return True, None
 
 class Medicine(models.Model):
+    """
+    Modelo que representa un medicamento.
+
+    Args:
+        name (str): Nombre del medicamento.
+        description (str): Descripción del medicamento.
+        dose (int): Dosis del medicamento.
+    """
+
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     dose = models.IntegerField()
@@ -385,6 +402,15 @@ class Medicine(models.Model):
         return True, None
 
 class Product (models.Model):
+    """
+    Modelo que representa una mascota.
+
+    Args:
+        name(str): Nombre del producto.
+        type(str): Tipo del producto.
+        price(float): Precio del producto.
+    """
+
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
     price = models.FloatField()
@@ -442,6 +468,15 @@ class Product (models.Model):
         return True, None
         
 class Pet (models.Model):
+    """
+    Modelo que representa una mascota.
+
+    Args:
+        name (str): Nombre de la mascota.
+        breed (str): Raza de la mascota.
+        birthday (date): Fecha de nacimiento de la mascota.
+    """
+
     name = models.CharField(max_length=100)
     breed = models.CharField(max_length=100)
     birthday = models.DateField()
@@ -499,6 +534,10 @@ class Pet (models.Model):
         return True, None
 
 class Speciality(Enum):
+    """
+    Enumeración que representa las especialidades veterinarias.
+    """
+
     Oftalmologia = "Oftalmologia"
     Quimioterapia = "Quimioterapia"
     Radiologia = "Radiologia"
@@ -518,6 +557,16 @@ class Speciality(Enum):
         return [(key.name, key.value) for key in cls]
 
 class Vet(models.Model):
+    """
+    Modelo que representa a un veterinario.
+
+    Atributos:
+        name (str): Nombre del veterinario.
+        email (EmailField): Dirección de correo electrónico del veterinario.
+        phone (str): Número de teléfono del veterinario.
+        speciality (str): Especialidad del veterinario.
+    """
+
     name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=15)
