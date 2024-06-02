@@ -3,6 +3,16 @@ from enum import Enum
 import datetime
 
 def validate_client(data):
+    """
+    Validate client data and return a dictionary of errors for missing or invalid fields.
+
+    This function checks for the presence of 'name', 'phone', and 'email' fields in the input data.
+    It ensures that each field is not empty, and additionally checks that the 'email' field contains
+    an '@' symbol to verify its validity.
+
+    :param data: A dictionary containing client data with keys 'name', 'phone', and 'email'.
+    :return: A dictionary containing error messages for each field that is missing or invalid.
+    """
     errors = {}
 
     name = data.get("name", "")
@@ -22,8 +32,11 @@ def validate_client(data):
 
     return errors
 
-
 def validate_provider(data):
+    """
+    Valida que los datos del formulario para crear o editar proveedores no queden vacíos. Además de validar que el mail contenga el símbolo @.
+    Retorna un diccionario con mensajes para los errores (o uno vacío si no hubiera).
+    """
     errors = {}
     
     name = data.get("name", "")
@@ -44,12 +57,17 @@ def validate_provider(data):
     return errors
 
 def validate_medicine(data):
+    """
+    Valida que los datos del formulario para crear o editar medicamentos no queden vacíos. Además de validar que la dosis quede dentro del rango 1 - 10.
+    Retorna un diccionario con mensajes para los errores (o uno vacío si no hubiera).
+    """
     errors = {}
 
     name = data.get("name", "")
     description = data.get("description", "")
     dose = data.get("dose")
-    if not dose is None:
+
+    if dose is not None:
         try:
             num = int(dose)
         except ValueError:
@@ -63,13 +81,18 @@ def validate_medicine(data):
     
     if dose is None or dose == "":
         errors["dose"] = "Por favor, ingrese una cantidad de la dosis de la medicina"
-    elif not (isinstance(dose, str) and dose.isdigit()):
+    elif not isinstance(dose, str) or not dose.isdigit():
         errors["dose"] = "La dosis debe ser un numero entero"
     elif not (num > 0 and num < 11):
         errors["dose"] = "La dosis debe estar entre 1 y 10"
+
     return errors
     
 def validate_product(data):
+    """
+    Valida que los campos no queden vacíos y que el precio sea siempre positivo.
+    Retorna un diccionario con mensajes para los errores (o uno vacío si no hubiera).
+    """
     errors={}
 
     name = data.get("name","")
@@ -96,6 +119,10 @@ def validate_product(data):
 
 
 def validate_pet(data):
+    """
+    Valida que los campos no queden vacíos y que la fecha sea menor a la fecha de hoy.
+    Retorna un diccionario con mensajes para los errores (o uno vacío si no hubiera).
+    """
     errors={}
 
     name = data.get("name","")
@@ -116,6 +143,10 @@ def validate_pet(data):
     return errors
 
 def validate_vet(data):
+    """
+    Valida que los campos no queden vacíos y que el email contenga el @
+    Retorna un diccionario con mensajes para los errores (o uno vacío si no hubiera).
+    """
     errors = {}
 
     name = data.get("name", "")

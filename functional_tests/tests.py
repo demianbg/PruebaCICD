@@ -834,7 +834,7 @@ class ProvidersRepoTestCase(PlaywrightTestCase):
         expect(delete_form.get_by_role("button", name="Eliminar")).to_be_visible()
 
     def test_should_be_able_to_delete_a_provider(self):
-        provider = Provider.objects.create(
+        Provider.objects.create(
             name="Bogado",
             email="demian@utn.com",
             address="Calle falsa 123",

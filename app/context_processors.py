@@ -12,7 +12,28 @@ links = [
 
 
 def navbar(request):
+    """
+    Generate a dictionary with links and their active status based on the request path.
+
+    This function takes a Django HttpRequest object and generates a dictionary
+    where each link in `links` is checked against the request path to determine
+    if it should be marked as active. The active status is added to the link's
+    dictionary.
+
+    :param request: The HttpRequest object containing metadata about the request.
+    :return: A dictionary containing the links with their active status.
+    """
     def add_active(link):
+        """
+        Add an 'active' key to the link dictionary based on the request path.
+
+        This helper function creates a copy of the link dictionary and determines
+        if the link should be marked as active based on whether the request path
+        matches or starts with the link's href.
+
+        :param link: A dictionary representing a link with at least an 'href' key.
+        :return: A copy of the link dictionary with an added 'active' key.
+        """
         copy = link.copy()
 
         if copy["href"] == "/":
