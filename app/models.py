@@ -31,7 +31,6 @@ def validate_client(data):
 
     return errors
 
-
 def validate_provider(data):
     """
     Valida los datos de un proveedor.
@@ -90,10 +89,11 @@ def validate_medicine(data):
     
     if dose is None or dose == "":
         errors["dose"] = "Por favor, ingrese una cantidad de la dosis de la medicina"
-    elif not (isinstance(dose, str) and dose.isdigit()):
+    elif not isinstance(dose, str) or not dose.isdigit():
         errors["dose"] = "La dosis debe ser un numero entero"
     elif not (num > 0 and num < 11):
         errors["dose"] = "La dosis debe estar entre 1 y 10"
+
     return errors
     
 def validate_product(data):

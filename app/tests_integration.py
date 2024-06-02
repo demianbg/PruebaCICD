@@ -233,7 +233,6 @@ class TestIntegration(TestCase):
         # Verifica que el producto no haya sido creado en la base de datos
         self.assertFalse(Product.objects.filter(name="ampicilina").exists())
 
-
 class PetsTest(TestCase):
     """
     Pruebas para el manejo de mascotas en el sistema.
