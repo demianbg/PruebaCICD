@@ -31,8 +31,11 @@ SECRET_KEY = os.getenv("SECRET_KEY", default_secret_key)#"django-insecure-p)^5i@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')#['0.0.0.0', 'localhost','127.0.0.1']
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', '*', 'https://vetsoft-1-0.onrender.com']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://vetsoft-1-0.onrender.com',
+]
 
 
 # Application definition
