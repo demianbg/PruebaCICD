@@ -1,8 +1,9 @@
-from django.test import TestCase
-from django.shortcuts import reverse
-from app.models import Client, Product, Pet, Vet, Speciality, Provider, Medicine
-
 import datetime
+
+from django.shortcuts import reverse
+from django.test import TestCase
+
+from app.models import Client, Medicine, Pet, Product, Provider, Speciality, Vet
 
 
 class HomePageTest(TestCase):

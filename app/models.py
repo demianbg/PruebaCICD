@@ -1,6 +1,8 @@
-from django.db import models
-from enum import Enum
 import datetime
+from enum import Enum
+
+from django.db import models
+
 
 def validate_client(data):
     """

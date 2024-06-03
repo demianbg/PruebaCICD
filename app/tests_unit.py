@@ -1,6 +1,21 @@
-from django.test import TestCase
-from app.models import Client, Pet, validate_pet, Vet, Speciality, validate_vet, Provider, validate_provider, validate_product, Medicine, validate_medicine, Product
 import datetime
+
+from django.test import TestCase
+
+from app.models import (
+    Client,
+    Medicine,
+    Pet,
+    Product,
+    Provider,
+    Speciality,
+    Vet,
+    validate_medicine,
+    validate_pet,
+    validate_product,
+    validate_provider,
+    validate_vet,
+)
 
 
 class ClientModelTest(TestCase):
